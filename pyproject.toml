@@ -1,0 +1,21 @@
+[project]
+name = "revou-module-7-assignment"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11.11"
+dependencies = [
+    "flask>=3.1.0",
+    "flask-jwt-extended>=4.7.1",
+    "flask-migrate>=4.1.0",
+    "flask-sqlalchemy>=3.1.1",
+    "psycopg2-binary>=2.9.10",
+    "pydantic[email]>=2.11.1",
+    "pytest>=8.3.5",
+    "pytest-cov>=6.0.0",
+    "python-dotenv>=1.1.0",
+    "taskipy>=1.14.1",
+]
+
+[tool.taskipy.tasks]
+fr = "flask --app app run --port 3002 --debug --reload"
