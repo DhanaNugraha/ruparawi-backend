@@ -1,5 +1,5 @@
 from instance.database import db
-from models.user import User
+from models.user import AdminLog, User
 from shared.time import now, datetime_from_string
 
 def user_by_id_repo(user_id):
@@ -47,4 +47,35 @@ def update_user_repo(user, user_data):
     if user_data.last_name:
         user.last_name = user_data.last_name
 
+    db.session.commit()
+
+
+# ------------------------------------------------------------- Admin -------------------------------------------------------------
+
+
+def admin_by_id_repo(user_id):
+    user = db.session.execute(
+        db.select(User).filter_by(id=user_id)
+    ).scalar_one_or_none()
+
+    # if user exist and is an admin
+    if user and user.admin_profile:
+        return user.admin_profile
+    
+    else :
+        return None
+    
+
+def log_admin_action_repo(user_id, request):
+    log = AdminLog(
+        admin_id=user_id,
+        action=f"{request.method} {request.path}",
+        timestamp=datetime_from_string(str(now()))
+    )
+
+    # still tentative
+    if request.args.get(user_id):
+        log.target_id = request.args.get(user_id)
+
+    db.session.add(log)
     db.session.commit()
