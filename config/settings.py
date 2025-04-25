@@ -4,6 +4,7 @@ from auth.jwt import init_jwt
 import models
 import router
 from config import configure_app
+from flask_cors import CORS
 
 
 def create_app(config_module = "config.local"):
@@ -11,6 +12,7 @@ def create_app(config_module = "config.local"):
     app.config.from_object(config_module)
     init_db(app)
     init_jwt(app)
+    CORS(app)
     configure_app()
     app.register_blueprint(router.auth_router)
     app.register_blueprint(router.user_router)
