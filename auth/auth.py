@@ -1,6 +1,6 @@
 from functools import wraps
 from flask_jwt_extended import get_jwt_identity
-from repo.user import admin_by_id_repo
+from repo.admin import admin_by_id_repo
 
 
 def super_admin_required():

@@ -1,5 +1,5 @@
 from instance.database import db
-from models.user import AdminLog, User
+from models.user import User
 from shared.time import now, datetime_from_string
 
 def user_by_id_repo(user_id):
@@ -8,11 +8,13 @@ def user_by_id_repo(user_id):
         description=f"No user with id '{user_id}'.",
     )
 
+
 def user_by_email_repo(email):
     return db.one_or_404(
         db.select(User).filter_by(email=email),
         description=f"No user with email '{email}'.",
     )
+
 
 def register_user_repo(user_data):
     new_user = User(
@@ -30,9 +32,11 @@ def register_user_repo(user_data):
     db.session.add(new_user)
     db.session.commit()
 
+
 def update_last_login_repo(queried_user):
     queried_user.last_login = datetime_from_string(str(now()))
     db.session.commit()
+
 
 def update_user_repo(user, user_data):
     if user_data.bio:
@@ -50,32 +54,3 @@ def update_user_repo(user, user_data):
     db.session.commit()
 
 
-# ------------------------------------------------------------- Admin -------------------------------------------------------------
-
-
-def admin_by_id_repo(user_id):
-    user = db.session.execute(
-        db.select(User).filter_by(id=user_id)
-    ).scalar_one_or_none()
-
-    # if user exist and is an admin
-    if user and user.admin_profile:
-        return user.admin_profile
-    
-    else :
-        return None
-    
-
-def log_admin_action_repo(user_id, request):
-    log = AdminLog(
-        admin_id=user_id,
-        action=f"{request.method} {request.path}",
-        timestamp=datetime_from_string(str(now()))
-    )
-
-    # still tentative
-    if request.args.get(user_id):
-        log.target_id = request.args.get(user_id)
-
-    db.session.add(log)
-    db.session.commit()
