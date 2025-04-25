@@ -234,7 +234,7 @@ def test_get_current_user(client, mock_user_data, mock_token_data):
     assert get_current_user.json["success"] is True
     assert get_current_user.json["user"]["email"] == mock_user_data["email"]
     assert get_current_user.json["user"]["username"] == mock_user_data["username"]
-    assert len(get_current_user.json["user"]) == 11
+    assert len(get_current_user.json["user"]) == 10
 
 
 def test_get_current_user_missing_user(client, mock_token_data):

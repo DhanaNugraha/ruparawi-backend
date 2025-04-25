@@ -1,7 +1,9 @@
 from .user import (
     User, 
     UserAddress, 
-    UserPaymentMethod
+    UserPaymentMethod,
+    AdminUser,
+    AdminLog
     )
 from .product import (
     ProductCategory,
@@ -28,6 +30,8 @@ __all__ = [
     "User",
     "UserAddress",
     "UserPaymentMethod",
+    "AdminUser",
+    "AdminLog",
     "ProductCategory",
     "SustainabilityAttribute",
     "Product",

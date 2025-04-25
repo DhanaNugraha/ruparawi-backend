@@ -440,3 +440,26 @@ def test_delete_product_not_vendor(client, mock_vendor_token_data, mock_vendor_d
     assert product.json["message"] == "You are not authorized to delete this product"
 
 
+# ----------------------------------------------------------------------------  Get category test ----------------------------------------------------------------------------
+
+
+def test_get_category(client, category_data_inject):
+    category = client.get("/products/category")
+
+    assert category.status_code == 200
+    assert category.json["success"] is True
+
+
+def test_get_category_by_id(client, category_data_inject):
+    category = client.get("/products/category/1")
+
+    assert category.status_code == 200
+    assert category.json["success"] is True
+
+
+def test_get_category_by_id_invalid_id(client, category_data_inject):
+    category = client.get("/products/category/3")
+
+    assert category.status_code == 500
+    assert category.json["success"] is False
+    assert category.json["location"] == "view get category detail repo"

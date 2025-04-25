@@ -113,6 +113,54 @@ def products_data_inject(test_app):
         return products_list
     
 
+
+@pytest.fixture
+def admins_data_inject(test_app):
+    admins_data = [
+        {
+            "user_id": 1,
+            "access_level": "admin",
+        },
+    ]
+    with test_app.app_context():
+        admins_list = []
+        for admin in admins_data:
+            admin_model = models.AdminUser(**admin)
+            admins_list.append(admin_model)
+
+        _db.session.add_all(admins_list)
+        _db.session.commit()
+
+        return admins_list
+    
+
+@pytest.fixture
+def category_data_inject(test_app):
+    category_data = [
+        {
+            "id": 1,
+            "name": "updated product",
+            "description": "test product description",
+        },
+        {
+            "id": 2,
+            "name": "updated product",
+            "description": "test product description",
+            "parent_category_id": 1
+        },
+    ]
+    with test_app.app_context():
+        category_list = []
+        for category in category_data:
+            category_model = models.ProductCategory(**category)
+            category_list.append(category_model)
+
+        _db.session.add_all(category_list)
+        _db.session.commit()
+
+        return category_list
+    
+
 @pytest.fixture
 def mock_user_data():
     return {
@@ -216,4 +264,29 @@ def mock_update_product_data():
         "stock_quantity": 100,
         "min_order_quantity": 2,
         "is_active": True
+    }
+
+
+@pytest.fixture
+def mock_category_data():
+    return {
+        "name": "category",
+        "description": "test category description",
+    }
+
+@pytest.fixture
+def mock_subcategory_data():
+    return {
+        "name": "subcategory",
+        "description": "test subcategory description",
+        "parent_category_id": 2
+    }
+
+
+@pytest.fixture
+def mock_update_category_data():
+    return {
+        "name": "category updated",
+        "description": "test category description updated",
+        "parent_category_id": 1
     }

@@ -99,7 +99,6 @@ class UserProfileResponse(BaseModel):
     profile_image_url: str | None
     bio: str | None
     is_vendor: bool
-    is_admin: bool
     last_login: datetime | None
     created_at: datetime
 

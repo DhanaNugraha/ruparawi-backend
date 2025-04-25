@@ -3,13 +3,16 @@ from pydantic import ValidationError
 from instance.database import db
 from repo.product import (
     create_product_repo,
+    get_category_by_id_repo,
     get_product_detail_repo,
     get_products_list_repo,
+    get_top_level_categories_repo,
     process_sustainability_repo,
     process_tags_repo,
     soft_delete_product_repo,
     update_product_repo,
 )
+from schemas.admin import CategoryResponse, CategoryTreeResponse
 from schemas.product import (
     ProductCreateRequest,
     ProductCreatedResponse,
@@ -136,15 +139,6 @@ def get_product_detail_view(product_id):
 
         return jsonify({"success": True, "product": serialized_product}), 200
 
-    except ValidationError as e:
-        return jsonify(
-            {
-                "message": str(e),
-                "success": False,
-                "location": "view get product detail data validation",
-            }
-        ), 500
-
     except Exception as e:
         return jsonify(
             {
@@ -257,3 +251,62 @@ def soft_delete_product_view(user, product_id):
                 "location": "view delete product repo",
             }
         ), 500
+
+
+# ------------------------------------------------------ Get Category Tree --------------------------------------------------
+
+
+def get_category_tree_view():
+    try:
+        # active categories with no parents
+        top_categories = get_top_level_categories_repo()
+        
+        # build category tree
+        categories_tree = []
+
+        for category in top_categories:
+            categories_tree.append(build_category_tree(category))
+
+        return {
+            "success": True,
+            "message": "Category tree fetched successfully",
+            "data": CategoryTreeResponse(categories=categories_tree).model_dump(),
+        }, 200
+
+    except Exception as e:
+        return {
+            "message": str(e),
+            "success": False,
+            "location": "view get category tree repo",
+        }, 500
+
+
+def build_category_tree(category):
+    # Recursively build category tree structure
+    category_data = CategoryResponse.model_validate(category)
+    if category.subcategories:
+        category_data.subcategories = [
+            build_category_tree(sub) for sub in category.subcategories
+        ]
+    return category_data
+
+
+# ------------------------------------------------------ Get category detail --------------------------------------------------
+
+
+def get_category_detail_view(category_id):
+    try:
+        category = get_category_by_id_repo(category_id)
+
+        return {
+            "success": True,
+            "message": "Category fetched successfully",
+            "category": CategoryResponse.model_validate(category).model_dump(),
+        }, 200
+
+    except Exception as e:
+        return {
+            "message": str(e),
+            "success": False,
+            "location": "view get category detail repo",
+        }, 500

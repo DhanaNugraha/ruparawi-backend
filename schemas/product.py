@@ -210,3 +210,5 @@ class ProductDeleteResponse(BaseModel):
     model_config = ConfigDict(
         from_attributes=True,  # Can read SQLAlchemy model
     )
+
+
