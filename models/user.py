@@ -71,6 +71,8 @@ class UserPaymentMethod(db.Model, BaseModel):
     is_default = db.Column(db.Boolean, default=False)
 
 
+# --------------------------------------------------------------------------- Admin ---------------------------------------------------------------------------
+
 # admin will be manually added in the database to be safe
 # Separate admin table for safety when querying user
 class AdminUser(db.Model):
@@ -94,6 +96,5 @@ class AdminUser(db.Model):
 class AdminLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     admin_id = db.Column(db.Integer, db.ForeignKey("users.id"))
-    action = db.Column(db.String(50))  # Ex: "user_deleted"
-    target_id = db.Column(db.Integer)  # Affected user_id
+    action = db.Column(db.String(50))  # route path
     timestamp = db.Column(db.DateTime, default=time.now())

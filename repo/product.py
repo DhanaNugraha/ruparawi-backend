@@ -1,5 +1,5 @@
 from instance.database import db
-from models.product import Product, SustainabilityAttribute, ProductTag
+from models.product import Product, ProductCategory, SustainabilityAttribute, ProductTag
 
 
 def create_product_repo(product_data, user_id):
@@ -122,3 +122,22 @@ def update_product_repo(user_id, product_id, update_data):
 def soft_delete_product_repo(product):
     product.is_active = False
     db.session.commit()
+
+
+def get_top_level_categories_repo():
+    return (
+        db.session.execute(
+            db.select(ProductCategory).filter_by(
+                parent_category_id=None, is_active=True
+            )
+        )
+        .scalars()
+        .all()
+    )
+
+
+def get_category_by_id_repo(category_id):
+    return db.one_or_404(
+        db.select(ProductCategory).filter_by(id=category_id),
+        description=f"Category does not exist '{category_id}'.",
+    )

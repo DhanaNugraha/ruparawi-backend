@@ -80,7 +80,6 @@ def user_login_view(user_request):
             "username": user.username,
             "email": user.email,
             "is_vendor": user.is_vendor,
-            "is_admin": user.is_admin,
         },
     )
 
@@ -96,7 +95,6 @@ def user_login_view(user_request):
                 "email": user.email,
                 "username": user.username,
                 "is_vendor": user.is_vendor,
-                "is_admin": user.is_admin,
             },
         }
     ), 200

@@ -22,6 +22,7 @@ class ProductCategory(db.Model, BaseModel):
     name = db.Column(db.String(50), nullable=False)
     description = db.Column(db.Text)
     parent_category_id = db.Column(db.Integer, db.ForeignKey("product_categories.id"))
+    is_active = db.Column(db.Boolean, default=True)
 
     # Self-referential relationship
     subcategories = db.relationship(
