@@ -12,7 +12,7 @@ class PublicUserProfileResponse(BaseModel):
     last_name: str | None
     profile_image_url: str | None
     bio: str | None
-    is_vendor: bool
+    role: str
     created_at: datetime
 
     model_config = ConfigDict(

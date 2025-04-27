@@ -5,12 +5,6 @@ import models
 import router
 from config import configure_app
 
-cors_config = {
-    "origins": ["*"],  # allow CORS requests from this origin
-    "methods": ["GET", "POST", "PUT", "DELETE"],  # allow these methods
-    "allow_headers": ["Content-Type", "Authorization"],  # allow these headers
-}
-
 
 def create_app(config_module = "config.local"):
     app = Flask(__name__)
@@ -22,6 +16,14 @@ def create_app(config_module = "config.local"):
     app.register_blueprint(router.user_router)
     app.register_blueprint(router.products_router)
     app.register_blueprint(router.admin_router)
+    app.register_blueprint(router.vendor_router)
     return app
 
 
+def cors_setup(app):
+    @app.after_request
+    def add_cors_headers(response):
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS, PUT, DELETE"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+        return response

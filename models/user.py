@@ -2,6 +2,18 @@ from instance.database import db
 from .base import BaseModel
 from shared import time
 from werkzeug.security import generate_password_hash, check_password_hash
+from enum import Enum
+
+# -------------------------------------- Enum --------------------------------------
+class UserRole(Enum):
+    BUYER = "buyer"
+    ADMIN = "admin"
+    VENDOR = "vendor"
+
+class VendorStatus(Enum):
+    PENDING = "pending"
+    APPROVED = "approved"
+    REJECTED = "rejected"
 
 
 # -------------------------------------- User --------------------------------------
@@ -17,9 +29,9 @@ class User(db.Model, BaseModel):
     last_name = db.Column(db.String(50))
     profile_image_url = db.Column(db.String(255))
     bio = db.Column(db.Text)
-    is_vendor = db.Column(db.Boolean, default=False)
-    vendor_status = db.Column(db.String(20)) # pending, approved, rejected
+    vendor_status = db.Column(db.String(20))
     last_login = db.Column(db.DateTime)
+    role = db.Column(db.String(20), default=UserRole.BUYER.value)
 
     # Relationships
     addresses = db.relationship("UserAddress", backref="user", lazy=True)

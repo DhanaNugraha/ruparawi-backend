@@ -28,15 +28,6 @@ from schemas.product import (
 
 
 def create_product_view(user, product_request):
-    if not user.is_vendor:
-        return jsonify(
-            {
-                "message": "User is not a vendor",
-                "success": False,
-                "location": "view create product vendor validation",
-            }
-        ), 403
-
     try:
         product_data_validated = ProductCreateRequest.model_validate(product_request)
 

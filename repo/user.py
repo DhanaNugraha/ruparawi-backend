@@ -20,7 +20,6 @@ def register_user_repo(user_data):
     new_user = User(
         username=user_data.username,
         email=user_data.email,
-        is_vendor=user_data.is_vendor,
         # for testing, created_at and updated_at are added
         # just using now() doesnt work for testing
         created_at=datetime_from_string(str(now())),
