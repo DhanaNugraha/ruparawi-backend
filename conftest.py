@@ -1,5 +1,5 @@
 import pytest
-from config.settings import create_app
+from config.settings import cors_setup, create_app
 from instance.database import db as _db
 import models
 from shared.time import datetime_from_string, now
@@ -9,6 +9,7 @@ import os
 def test_app():
     config_module = os.environ["FLASK_CONFIG"] = "config.testing"
     app = create_app(config_module)
+    cors_setup(app)
     with app.app_context():
         _db.create_all()
         _db.session.rollback()
