@@ -36,7 +36,6 @@ def category_detail(category_id):
 @admin_router.after_request
 @jwt_required()
 def log_admin_actions_after_request(response):
-    print("Logging admin actions")
     if request.method in ["PUT", "DELETE", "POST"]:
         log_admin_action_repo(current_user, request)
 

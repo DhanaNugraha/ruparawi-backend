@@ -1,8 +1,8 @@
 from instance.database import db
 from .base import BaseModel
-from enum import Enum as PyEnum
+from enum import Enum
 
-class OrderStatus(PyEnum):
+class OrderStatus(Enum):
     PENDING = "pending"
     PROCESSING = "processing"
     SHIPPED = "shipped"
@@ -10,7 +10,7 @@ class OrderStatus(PyEnum):
     CANCELLED = "cancelled"
 
 
-class PaymentStatus(PyEnum):
+class PaymentStatus(Enum):
     PENDING = "pending"
     PAID = "paid"
     FAILED = "failed"

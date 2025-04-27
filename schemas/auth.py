@@ -10,7 +10,6 @@ class UserRegisterRequest(BaseModel):
     username: str
     email: str
     password: str
-    is_vendor: bool = False
 
     @field_validator("username")
     def validate_username(cls, value):
@@ -108,7 +107,7 @@ class UserProfileResponse(BaseModel):
     last_name: str | None
     profile_image_url: str | None
     bio: str | None
-    is_vendor: bool
+    role: str
     last_login: datetime | None
     created_at: datetime
 
