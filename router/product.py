@@ -19,6 +19,7 @@ def specific_product_route(product_id):
     match request.method.lower():
         case "put":
             return update_product_view(current_user, request.json, product_id)
+        
         case "delete":
             return soft_delete_product_view(current_user, product_id)
 
@@ -43,6 +44,11 @@ def get_category_detail(category_id):
     return get_category_detail_view(category_id)
 
 
-
+@products_router.after_request
+def add_cors_headers(response):
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS, PUT, DELETE"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+    return response
         
     

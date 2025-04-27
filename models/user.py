@@ -4,6 +4,9 @@ from shared import time
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
+# -------------------------------------- User --------------------------------------
+
+
 class User(db.Model, BaseModel):
     __tablename__ = "users"
 
@@ -15,6 +18,7 @@ class User(db.Model, BaseModel):
     profile_image_url = db.Column(db.String(255))
     bio = db.Column(db.Text)
     is_vendor = db.Column(db.Boolean, default=False)
+    vendor_status = db.Column(db.String(20)) # pending, approved, rejected
     last_login = db.Column(db.DateTime)
 
     # Relationships
@@ -25,7 +29,10 @@ class User(db.Model, BaseModel):
     reviews_written = db.relationship("ProductReview", backref="reviewer", lazy=True)
     # uselist false for one to one. lazy joined to get cart with user.cart
     cart = db.relationship("ShoppingCart", backref="user",  uselist=False, lazy="joined" )
-    # admin = db.relationship("AdminUser", backref="user", uselist=False, lazy="joined")
+    vendor_profile = db.relationship(
+        "VendorProfile", backref="user", uselist=False, lazy="joined"
+    )
+
 
     @property
     def password(self):
@@ -69,6 +76,24 @@ class UserPaymentMethod(db.Model, BaseModel):
     account_number = db.Column(db.String(100), nullable=False)
     expiry_date = db.Column(db.Date)
     is_default = db.Column(db.Boolean, default=False)
+
+
+# --------------------------------------------------------------------------- Vendor ---------------------------------------------------------------------------
+
+class VendorProfile(db.Model):
+    __tablename__ = "vendor_profiles"
+
+    user_id = db.Column(
+        db.Integer, db.ForeignKey("users.id"), nullable=False, primary_key=True
+    )
+    business_name = db.Column(db.String(100), nullable=False)
+    business_description = db.Column(db.Text)
+    business_address = db.Column(db.String(200))
+    business_phone = db.Column(db.String(20))
+    business_email = db.Column(db.String(100))
+    business_logo_url = db.Column(db.String(255))
+    created_at = db.Column(db.DateTime, default=time.now())
+    updated_at = db.Column(db.DateTime, default=time.now(), onupdate=time.now())
 
 
 # --------------------------------------------------------------------------- Admin ---------------------------------------------------------------------------

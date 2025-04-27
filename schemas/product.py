@@ -66,7 +66,10 @@ class ProductCreatedResponse(BaseModel):
     name: str
     vendor_id: int
 
-    model_config = ConfigDict(from_attributes=True)  # Can read SQLAlchemy model
+    model_config = ConfigDict(
+        from_attributes=True,  # Can read SQLAlchemy model
+        extra="ignore",  # ignore extra fields
+    )
 
 
 # -------------------------------------------------- Get Products List --------------------------------------------------
@@ -99,12 +102,15 @@ class ProductListResponse(BaseModel):
     tags: List[object] | str
     vendor_id: int
 
-    model_config = ConfigDict(from_attributes=True)  # Can read SQLAlchemy model
-
     @field_validator("tags")
     def validate_tags(cls, value):
         # repr to convert class object to string
         return repr([tag.name for tag in value])
+
+    model_config = ConfigDict(
+        from_attributes=True,  # Can read SQLAlchemy model
+        extra="ignore",  # ignore extra fields
+    )
 
 
 # -------------------------------------------------- Get Product Detail --------------------------------------------------
@@ -139,6 +145,7 @@ class ProductDetailResponse(BaseModel):
 
     model_config = ConfigDict(
         from_attributes=True,  # Can read SQLAlchemy model
+        extra="ignore",  # ignore extra fields
     )
 
 
@@ -209,6 +216,5 @@ class ProductDeleteResponse(BaseModel):
 
     model_config = ConfigDict(
         from_attributes=True,  # Can read SQLAlchemy model
+        extra="ignore",  # ignore extra fields
     )
-
-

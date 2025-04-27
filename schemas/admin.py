@@ -14,7 +14,10 @@ class CategoryCreate(BaseModel):
         
         return value
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(
+        from_attributes=True,  # Can read SQLAlchemy model
+        extra="ignore",  # ignore extra fields
+    )
 
 
 class CategoryResponse(BaseModel):
@@ -24,7 +27,10 @@ class CategoryResponse(BaseModel):
     name: str
     description: Optional[str] = None
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(
+        from_attributes=True,  # Can read SQLAlchemy model
+        extra="ignore",  # ignore extra fields
+    )
 
 
 class CategoryTreeResponse(BaseModel):
@@ -43,7 +49,10 @@ class CategoryUpdate(BaseModel):
         
         return value
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(
+        from_attributes=True,  # Can read SQLAlchemy model
+        extra="ignore",  # ignore extra fields
+    )
 
 class CategoryUpdateResponse(BaseModel):
     id: Optional[int] = None
@@ -51,4 +60,7 @@ class CategoryUpdateResponse(BaseModel):
     name: str
     description: Optional[str] = None
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(
+        from_attributes=True,  # Can read SQLAlchemy model
+        extra="ignore",  # ignore extra fields
+    )

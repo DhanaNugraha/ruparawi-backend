@@ -51,6 +51,11 @@ class UserRegisterRequest(BaseModel):
 
         return value.lower()  # Normalize to lowercase
 
+    model_config = ConfigDict(
+        from_attributes=True,  # Can read SQLAlchemy model
+        extra="ignore",  # ignore extra fields
+    )
+
 
 # -------------------------------------------------- Login User --------------------------------------------------
 
@@ -85,6 +90,11 @@ class UserLoginRequest(BaseModel):
             raise ValueError("Password must be at least 8 characters")
 
         return value
+
+    model_config = ConfigDict(
+        from_attributes=True,  # Can read SQLAlchemy model
+        extra="ignore",  # ignore extra fields
+    )
 
 
 # -------------------------------------------------- User Profile --------------------------------------------------
