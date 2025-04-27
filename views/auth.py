@@ -79,7 +79,7 @@ def user_login_view(user_request):
         additional_claims={
             "username": user.username,
             "email": user.email,
-            "is_vendor": user.is_vendor,
+            "role" : user.role
         },
     )
 
@@ -94,7 +94,7 @@ def user_login_view(user_request):
                 "id": user.id,
                 "email": user.email,
                 "username": user.username,
-                "is_vendor": user.is_vendor,
+                "role": user.role
             },
         }
     ), 200

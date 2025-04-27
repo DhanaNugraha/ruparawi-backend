@@ -16,13 +16,13 @@ def create_app(config_module = "config.local"):
     app.register_blueprint(router.user_router)
     app.register_blueprint(router.products_router)
     app.register_blueprint(router.admin_router)
+    app.register_blueprint(router.vendor_router)
     return app
 
 
 def cors_setup(app):
     @app.after_request
     def add_cors_headers(response):
-        print("Adding CORS headers")
         response.headers["Access-Control-Allow-Origin"] = "*"
         response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS, PUT, DELETE"
         response.headers["Access-Control-Allow-Headers"] = "Content-Type"

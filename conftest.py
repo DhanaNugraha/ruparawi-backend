@@ -2,6 +2,7 @@ import pytest
 from config.settings import cors_setup, create_app
 from instance.database import db as _db
 import models
+from models.user import UserRole
 from shared.time import datetime_from_string, now
 import os
 
@@ -44,7 +45,7 @@ def users_data_inject(test_app):
             "password_hash": "testing/password",
             "created_at": datetime_from_string(str(now())),
             "updated_at": datetime_from_string(str(now())),
-            "is_vendor": False,
+            "role": UserRole.BUYER.value,
         },
         {
             "id": 2,
@@ -53,7 +54,7 @@ def users_data_inject(test_app):
             "password_hash": "testing/password",
             "created_at": datetime_from_string(str(now())),
             "updated_at": datetime_from_string(str(now())),
-            "is_vendor": False,
+            "role": UserRole.BUYER.value,
         },
     ]
     with test_app.app_context():
@@ -198,7 +199,6 @@ def mock_vendor_data():
         "username": "eco_seller",
         "email": "seller@example.com",
         "password": "sustainable123",
-        "is_vendor": True
     }
 
 
@@ -290,4 +290,15 @@ def mock_update_category_data():
         "name": "category updated",
         "description": "test category description updated",
         "parent_category_id": 1
+    }
+
+@pytest.fixture
+def mock_vendor_apply_data():
+    return {
+        "business_name": "Eco Foods",
+        "business_email": "vendor@ecofoods.com",
+        "business_phone": "+1234567890",
+        "business_address": "123 Green St, Eco City",
+        "business_description": "Organic food supplier",
+        "business_logo_url": "https://example.com/profile.jpg",
     }
