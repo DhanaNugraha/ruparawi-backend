@@ -164,6 +164,58 @@ def category_data_inject(test_app):
     
 
 @pytest.fixture
+def approved_vendor_profile_inject(test_app):
+    vendor_profile_data = [
+        {
+            "user_id": 1,
+            "vendor_status" : "approved",
+            "business_name": "Eco Foods",
+            "business_email": "vendor@ecofoods.com",
+            "business_phone": "+1234567890",
+            "business_address": "123 Green St, Eco City",
+            "business_description": "Organic food supplier",
+            "business_logo_url" : "https://example.com/profile.jpg"
+        },
+    ]
+    with test_app.app_context():
+        vendor_profile_list = []
+        for vendor_profile in vendor_profile_data:
+            vendor_profile_model = models.VendorProfile(**vendor_profile)
+            vendor_profile_list.append(vendor_profile_model)
+
+        _db.session.add_all(vendor_profile_list)
+        _db.session.commit()
+
+        return vendor_profile_list
+    
+
+@pytest.fixture
+def pending_vendor_profile_inject(test_app):
+    vendor_profile_data = [
+        {
+            "user_id": 1,
+            "vendor_status": "pending",
+            "business_name": "Eco Foods",
+            "business_email": "vendor@ecofoods.com",
+            "business_phone": "+1234567890",
+            "business_address": "123 Green St, Eco City",
+            "business_description": "Organic food supplier",
+            "business_logo_url": "https://example.com/profile.jpg",
+        },
+    ]
+    with test_app.app_context():
+        vendor_profile_list = []
+        for vendor_profile in vendor_profile_data:
+            vendor_profile_model = models.VendorProfile(**vendor_profile)
+            vendor_profile_list.append(vendor_profile_model)
+
+        _db.session.add_all(vendor_profile_list)
+        _db.session.commit()
+
+        return vendor_profile_list
+    
+
+@pytest.fixture
 def mock_user_data():
     return {
         "username": "eco_buyer",

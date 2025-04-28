@@ -2,7 +2,7 @@ from flask import jsonify
 from pydantic import ValidationError
 from instance.database import db
 from models.user import UserRole
-from repo.vendor import vendor_register_repo
+from repo.vendor import vendor_profile_by_user_id_repo, vendor_register_repo
 from schemas.vendor import VendorCreateRequest
 
 
@@ -10,8 +10,10 @@ def vendor_register_view(user, vendor_request):
     try:
         # Prevent duplicate applications
         if user.role == UserRole.VENDOR.value:
+            vendor_profile = vendor_profile_by_user_id_repo(user.id)
+            
             return jsonify(
-                {"error": "Vendor already registered", "status": user.vendor_status}
+                {"message": "Vendor already registered", "status": vendor_profile.vendor_status}
             ), 400
 
         vendor_data_validated = VendorCreateRequest.model_validate(vendor_request)
