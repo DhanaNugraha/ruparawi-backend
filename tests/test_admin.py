@@ -208,4 +208,91 @@ def test_admin_logs(client, mock_category_data, mock_user_data, mock_token_data,
     assert admin_log.admin_id == 1
 
 
-# test for vendor approval
+# ---------------------------------------------------------------------------- Vendor application approval Tests ----------------------------------------------------------------------------
+
+def test_review_vendor_application(
+    client,
+    mock_user_data,
+    mock_token_data,
+    mock_admin_vendor_review_data,
+    db,
+    pending_vendor_profile_inject,
+    admins_data_inject,
+):
+    register_user = client.post("/auth/register", json=mock_user_data)
+
+    assert register_user.status_code == 201
+
+    review_vendor_application = client.post("/admin/vendor/1/review", json=mock_admin_vendor_review_data, headers=mock_token_data)
+
+    assert review_vendor_application.status_code == 200
+    assert review_vendor_application.json["success"] is True
+
+
+def test_review_vendor_application_action_validation_error(client, mock_user_data, mock_token_data, mock_admin_vendor_review_data, admins_data_inject):
+    register_user = client.post("/auth/register", json=mock_user_data)
+
+    assert register_user.status_code == 201
+
+    mock_admin_vendor_review_data["action"] = ""
+
+    review_vendor_application = client.post("/admin/vendor/1/review", json=mock_admin_vendor_review_data, headers=mock_token_data)
+
+    assert review_vendor_application.status_code == 400
+    assert review_vendor_application.json["success"] is False
+    assert (
+        review_vendor_application.json["location"]
+        == "view review vendor application request validation"
+    )
+
+
+def test_review_vendor_application_reason_validation_error(
+    client,
+    mock_user_data,
+    mock_token_data,
+    mock_admin_vendor_review_data,
+    admins_data_inject,
+):
+    register_user = client.post("/auth/register", json=mock_user_data)
+
+    assert register_user.status_code == 201
+
+    mock_admin_vendor_review_data["reason"] = "a" * 501
+
+    review_vendor_application = client.post(
+        "/admin/vendor/1/review",
+        json=mock_admin_vendor_review_data,
+        headers=mock_token_data,
+    )
+
+    assert review_vendor_application.status_code == 400
+    assert review_vendor_application.json["success"] is False
+    assert (
+        review_vendor_application.json["location"]
+        == "view review vendor application request validation"
+    )
+
+
+def test_review_vendor_application_repo_error(
+    client,
+    mock_user_data,
+    mock_token_data,
+    mock_admin_vendor_review_data,
+    admins_data_inject,
+):
+    register_user = client.post("/auth/register", json=mock_user_data)
+
+    assert register_user.status_code == 201
+
+    review_vendor_application = client.post(
+        "/admin/vendor/2/review",
+        json=mock_admin_vendor_review_data,
+        headers=mock_token_data,
+    )
+
+    assert review_vendor_application.status_code == 500
+    assert review_vendor_application.json["success"] is False
+    assert (
+        review_vendor_application.json["location"]
+        == "view review vendor application repo"
+    )

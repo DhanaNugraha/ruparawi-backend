@@ -1,6 +1,6 @@
 from flask import Blueprint, request
 from flask_jwt_extended import current_user, jwt_required
-from auth.auth import super_admin_required, admin_required
+from auth.auth import admin_required
 from repo.admin import log_admin_action_repo
 from views.admin import create_category_view, soft_delete_category_view, update_category_view, review_vendor_application_view
 

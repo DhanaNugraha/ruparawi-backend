@@ -354,3 +354,7 @@ def mock_vendor_apply_data():
         "business_description": "Organic food supplier",
         "business_logo_url": "https://example.com/profile.jpg",
     }
+
+@pytest.fixture
+def mock_admin_vendor_review_data():
+    return {"action": "approve", "reason": "testing"}

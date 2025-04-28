@@ -6,26 +6,26 @@ from repo.admin import admin_by_id_repo
 from repo.vendor import vendor_profile_by_user_id_repo
 
 
-def super_admin_required():
-    def wrapper(fn):
-        @wraps(fn)
-        def decorator(*args, **kwargs):
-            user_id = get_jwt_identity()
+# def super_admin_required():
+#     def wrapper(fn):
+#         @wraps(fn)
+#         def decorator(*args, **kwargs):
+#             user_id = get_jwt_identity()
 
-            admin = admin_by_id_repo(user_id)
+#             admin = admin_by_id_repo(user_id)
 
-            if not admin:
-                return jsonify({"error": "Admin privileges required"}), 403
+#             if not admin:
+#                 return jsonify({"error": "Admin privileges required"}), 403
 
-            elif admin.access_level != "super":
-                return jsonify({"error": "Super admin required"}), 403
+#             elif admin.access_level != "super":
+#                 return jsonify({"error": "Super admin required"}), 403
 
-            else:
-                return fn(*args, **kwargs)
+#             else:
+#                 return fn(*args, **kwargs)
 
-        return decorator
+#         return decorator
 
-    return wrapper
+#     return wrapper
 
 
 def admin_required():
