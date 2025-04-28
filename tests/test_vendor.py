@@ -215,6 +215,33 @@ def test_vendor_apply_logo_validation_error(
 
     assert apply_vendor.status_code == 201
 
-# test vendor not approved in auth auth
 
-# testing validation error
+# ----------------------------------------------------------------------------- Get vendor profile -----------------------------------------------------------
+
+def test_get_vendor_profile(client, mock_user_data, mock_token_data, approved_vendor_profile_inject):
+    register_user = client.post("/auth/register", json=mock_user_data)
+
+    assert register_user.status_code == 201
+
+    get_vendor_profile = client.get("/vendor/profile", headers=mock_token_data)
+
+    assert get_vendor_profile.status_code == 200
+    assert get_vendor_profile.json["success"] is True
+    assert len(get_vendor_profile.json["vendor"]) == 9
+
+
+# ----------------------------------------------------------------------------- Get vendor products -----------------------------------------------------------
+
+def test_get_vendor_products(client, mock_user_data, mock_token_data, approved_vendor_profile_inject, products_data_inject):
+    register_user = client.post("/auth/register", json=mock_user_data)
+
+    assert register_user.status_code == 201
+
+    get_vendor_products = client.get("/vendor/products?page=1&per_page=2", headers=mock_token_data)
+
+    assert get_vendor_products.status_code == 200
+    assert get_vendor_products.json["success"] is True
+    assert len(get_vendor_products.json["products"]) == 1
+
+
+

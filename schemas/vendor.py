@@ -1,3 +1,4 @@
+from datetime import datetime
 import re
 from typing import Optional
 from pydantic import BaseModel, ConfigDict, field_validator
@@ -89,6 +90,23 @@ class VendorCreateRequest(BaseModel):
             raise ValueError("URL too long (max 500 chars)")
 
         return value.strip()
+
+    model_config = ConfigDict(
+        from_attributes=True,  # Can read SQLAlchemy model
+        extra="ignore",  # ignore extra fields
+    )
+
+
+class VendorProfileResponse(BaseModel):
+    business_name: str
+    business_email: str
+    business_phone: str
+    business_address: str
+    business_description: Optional[str] = None
+    business_logo_url: Optional[str] = None
+    vendor_status: str
+    created_at: datetime
+    updated_at: datetime
 
     model_config = ConfigDict(
         from_attributes=True,  # Can read SQLAlchemy model
