@@ -44,6 +44,7 @@ class User(db.Model, BaseModel):
     vendor_profile = db.relationship(
         "VendorProfile", backref="user", uselist=False, lazy="joined"
     )
+    articles = db.relationship('Article', backref='author', lazy=True)
 
 
     @property
@@ -135,3 +136,5 @@ class AdminLog(db.Model):
     admin_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     action = db.Column(db.String(50))  # route path
     timestamp = db.Column(db.DateTime, default=time.now())
+    
+    

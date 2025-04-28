@@ -1,6 +1,7 @@
 from instance.database import db
 from models.product import ProductCategory
 from models.user import AdminLog, User
+from models.articles import Article
 from repo.product import get_category_by_id_repo
 from shared.time import now, datetime_from_string
 
@@ -75,3 +76,13 @@ def soft_delete_category_repo(category_id):
 
     db.session.commit()
     return category
+
+
+def get_article_by_id_repo(article_id):
+    try:
+        article = Article.query.get(article_id)
+        if not article:
+            raise Exception(f"Article with ID {article_id} not found.")
+        return article
+    except Exception as e:
+        raise Exception(f"Error while fetching article by ID: {str(e)}")

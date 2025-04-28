@@ -3,7 +3,7 @@ from flask_jwt_extended import current_user
 from models.article import Article
 from pydantic import ValidationError
 from instance.database import db
-from repo.admin import check_parent_category_repo, create_category_repo, soft_delete_category_repo, update_category_repo
+from repo.admin import check_parent_category_repo, create_category_repo, get_article_by_id_repo, soft_delete_category_repo, update_category_repo, get_all_articles_repo
 from schemas.admin import CategoryCreate, CategoryResponse, CategoryUpdate, CategoryUpdateResponse
 
 # ------------------------------------------------------ Create Category --------------------------------------------------
@@ -208,13 +208,7 @@ def get_articles_view():
 
 def get_article_by_id_view(article_id):
     try:
-        article = Article.query.get(article_id)
-        if not article:
-            return jsonify({
-                "success": False,
-                "message": "Article not found",
-                "location": "view get article by id validation"
-            }), 404
+        article = get_article_by_id_repo(article_id)
 
         result = {
             "id": article.id,
@@ -224,6 +218,7 @@ def get_article_by_id_view(article_id):
             "created_at": article.created_at.isoformat(),
             "updated_at": article.updated_at.isoformat()
         }
+
         return jsonify({
             "success": True,
             "message": "Article retrieved successfully",
@@ -234,7 +229,7 @@ def get_article_by_id_view(article_id):
         return jsonify({
             "success": False,
             "message": str(e),
-            "location": "view get article by id repo"
+            "location": "view get article by id"
         }), 500
 
 
