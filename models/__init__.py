@@ -2,6 +2,7 @@ from .user import (
     User, 
     UserAddress, 
     UserPaymentMethod,
+    VendorProfile,
     AdminUser,
     AdminLog
     )

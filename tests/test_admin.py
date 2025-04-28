@@ -208,4 +208,4 @@ def test_admin_logs(client, mock_category_data, mock_user_data, mock_token_data,
     assert admin_log.admin_id == 1
 
 
-# dont forget test for get category in product test
+# test for vendor approval
