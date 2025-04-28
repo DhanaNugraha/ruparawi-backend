@@ -2,7 +2,7 @@ from flask import Blueprint, request
 from flask_jwt_extended import current_user, jwt_required
 from auth.auth import super_admin_required, admin_required
 from repo.admin import log_admin_action_repo
-from views.admin import create_category_view, soft_delete_category_view, update_category_view
+from views.admin import create_article_view, create_category_view, delete_article_view, get_article_by_id_view, get_articles_view, soft_delete_category_view, update_article_view, update_category_view
 
 
 admin_router = Blueprint("admin_router", __name__, url_prefix="/admin")
@@ -42,3 +42,27 @@ def log_admin_actions_after_request(response):
     return response
 
 
+# ------------------------------------------------------ Management Article --------------------------------------------------
+@admin_router.route("/article", methods=["POST"])
+@jwt_required()
+@admin_required()
+def create_article():
+    return create_article_view(request.json)
+
+@admin_router.route("/article", methods=["GET"])
+@jwt_required()
+@admin_required()
+def get_articles():
+    return get_articles_view()
+
+@admin_router.route("/article/<int:article_id>", methods=["GET", "PUT", "DELETE"])
+@jwt_required()
+@admin_required()
+def article_detail(article_id):
+    match request.method.lower():
+        case "get":
+            return get_article_by_id_view(article_id)
+        case "put":
+            return update_article_view(request.json, article_id)
+        case "delete":
+            return delete_article_view(article_id)
