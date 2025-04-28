@@ -2,7 +2,7 @@ from flask import Blueprint, request
 from flask_jwt_extended import current_user, jwt_required
 from auth.auth import super_admin_required, admin_required
 from repo.admin import log_admin_action_repo
-from views.admin import create_category_view, soft_delete_category_view, update_category_view
+from views.admin import create_category_view, soft_delete_category_view, update_category_view, review_vendor_application_view
 
 
 admin_router = Blueprint("admin_router", __name__, url_prefix="/admin")
@@ -29,8 +29,12 @@ def category_detail(category_id):
             return soft_delete_category_view(category_id)
 
 
+@admin_router.route("/vendor/<int:user_id>/review", methods=["POST"])
+@jwt_required()
+@admin_required()
+def review_vendor_application(user_id):
+    return review_vendor_application_view(user_id, request.json)
 
-# delete user permanently will require super
 
 # logs admin actions after every request
 @admin_router.after_request

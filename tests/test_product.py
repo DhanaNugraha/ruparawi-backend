@@ -12,18 +12,12 @@ def test_create_product(
     mock_create_product_data,
     mock_vendor_token_data,
     mock_vendor_data,
-    mock_vendor_apply_data,
     db,
+    approved_vendor_profile_inject,
 ):
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
 
     assert register_vendor.status_code == 201
-
-    apply_vendor = client.post(
-        "/vendor/apply", json=mock_vendor_apply_data, headers=mock_vendor_token_data
-    )
-
-    assert apply_vendor.status_code == 201
 
     product = client.post(
         "/products", json=mock_create_product_data, headers=mock_vendor_token_data
@@ -44,7 +38,11 @@ def test_create_product(
 
 
 def test_create_product_not_vendor(
-    client, mock_create_product_data, mock_token_data, mock_user_data
+    client,
+    mock_create_product_data,
+    mock_token_data,
+    mock_user_data,
+    pending_vendor_profile_inject,
 ):
     register_user = client.post("/auth/register", json=mock_user_data)
 
@@ -56,7 +54,7 @@ def test_create_product_not_vendor(
 
     assert product.status_code == 403
     assert product.json["success"] is False
-    assert product.json["message"] == "Vendor account required"
+    assert product.json["message"] == "Vendor not approved"
 
 
 def test_create_product_name_validation_error(
@@ -64,17 +62,11 @@ def test_create_product_name_validation_error(
     mock_create_product_data,
     mock_vendor_token_data,
     mock_vendor_data,
-    mock_vendor_apply_data,
+    approved_vendor_profile_inject,
 ):
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
 
     assert register_vendor.status_code == 201
-
-    apply_vendor = client.post(
-        "/vendor/apply", json=mock_vendor_apply_data, headers=mock_vendor_token_data
-    )
-
-    assert apply_vendor.status_code == 201
 
     mock_create_product_data["name"] = ""
 
@@ -92,17 +84,11 @@ def test_create_product_description_validation_error(
     mock_create_product_data,
     mock_vendor_token_data,
     mock_vendor_data,
-    mock_vendor_apply_data,
+    approved_vendor_profile_inject,
 ):
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
 
     assert register_vendor.status_code == 201
-
-    apply_vendor = client.post(
-        "/vendor/apply", json=mock_vendor_apply_data, headers=mock_vendor_token_data
-    )
-
-    assert apply_vendor.status_code == 201
 
     mock_create_product_data["description"] = ""
 
@@ -120,17 +106,11 @@ def test_create_product_price_validation_error(
     mock_create_product_data,
     mock_vendor_token_data,
     mock_vendor_data,
-    mock_vendor_apply_data,
+    approved_vendor_profile_inject,
 ):
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
 
     assert register_vendor.status_code == 201
-
-    apply_vendor = client.post(
-        "/vendor/apply", json=mock_vendor_apply_data, headers=mock_vendor_token_data
-    )
-
-    assert apply_vendor.status_code == 201
 
     mock_create_product_data["price"] = -1
 
@@ -148,17 +128,11 @@ def test_create_product_tags_validation_error(
     mock_create_product_data,
     mock_vendor_token_data,
     mock_vendor_data,
-    mock_vendor_apply_data,
+    approved_vendor_profile_inject,
 ):
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
 
     assert register_vendor.status_code == 201
-
-    apply_vendor = client.post(
-        "/vendor/apply", json=mock_vendor_apply_data, headers=mock_vendor_token_data
-    )
-
-    assert apply_vendor.status_code == 201
 
     mock_create_product_data["tags"] = [i for i in ("a" * 15)]
 
@@ -176,17 +150,11 @@ def test_create_product_sustainability_attributes_validation_error(
     mock_create_product_data,
     mock_vendor_token_data,
     mock_vendor_data,
-    mock_vendor_apply_data,
+    approved_vendor_profile_inject,
 ):
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
 
     assert register_vendor.status_code == 201
-
-    apply_vendor = client.post(
-        "/vendor/apply", json=mock_vendor_apply_data, headers=mock_vendor_token_data
-    )
-
-    assert apply_vendor.status_code == 201
 
     mock_create_product_data["sustainability_attributes"] = [i for i in ("a" * 10)]
 
@@ -204,17 +172,11 @@ def test_create_product_stock_validation_error(
     mock_create_product_data,
     mock_vendor_token_data,
     mock_vendor_data,
-    mock_vendor_apply_data,
+    approved_vendor_profile_inject,
 ):
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
 
     assert register_vendor.status_code == 201
-
-    apply_vendor = client.post(
-        "/vendor/apply", json=mock_vendor_apply_data, headers=mock_vendor_token_data
-    )
-
-    assert apply_vendor.status_code == 201
 
     mock_create_product_data["stock_quantity"] = -1
 
@@ -232,17 +194,11 @@ def test_create_product_order_quantity_validation_error(
     mock_create_product_data,
     mock_vendor_token_data,
     mock_vendor_data,
-    mock_vendor_apply_data,
+    approved_vendor_profile_inject,
 ):
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
 
     assert register_vendor.status_code == 201
-
-    apply_vendor = client.post(
-        "/vendor/apply", json=mock_vendor_apply_data, headers=mock_vendor_token_data
-    )
-
-    assert apply_vendor.status_code == 201
 
     mock_create_product_data["min_order_quantity"] = 0
 
@@ -271,17 +227,11 @@ def test_get_product_with_args(
     mock_multiple_create_product_data,
     mock_vendor_token_data,
     mock_vendor_data,
-    mock_vendor_apply_data,
+    approved_vendor_profile_inject,
 ):
     # register vendor
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
     assert register_vendor.status_code == 201
-
-    # apply vendor
-    apply_vendor = client.post(
-        "/vendor/apply", json=mock_vendor_apply_data, headers=mock_vendor_token_data
-    )
-    assert apply_vendor.status_code == 201
 
     # insert product
     for product in mock_multiple_create_product_data:
@@ -334,19 +284,13 @@ def test_update_product_details(
     mock_update_product_data,
     mock_vendor_token_data,
     mock_vendor_data,
-    mock_vendor_apply_data,
     db,
     products_data_inject,
+    approved_vendor_profile_inject,
 ):
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
 
     assert register_vendor.status_code == 201
-
-    apply_vendor = client.post(
-        "/vendor/apply", json=mock_vendor_apply_data, headers=mock_vendor_token_data
-    )
-
-    assert apply_vendor.status_code == 201
 
     product = client.put(
         "/products/1", json=mock_update_product_data, headers=mock_vendor_token_data
@@ -372,17 +316,11 @@ def test_update_product_name_validation_error(
     mock_update_product_data,
     mock_vendor_token_data,
     mock_vendor_data,
-    mock_vendor_apply_data,
+    approved_vendor_profile_inject,
 ):
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
 
     assert register_vendor.status_code == 201
-
-    apply_vendor = client.post(
-        "/vendor/apply", json=mock_vendor_apply_data, headers=mock_vendor_token_data
-    )
-
-    assert apply_vendor.status_code == 201
 
     mock_update_product_data["name"] = ""
 
@@ -400,17 +338,11 @@ def test_update_product_description_validation_error(
     mock_update_product_data,
     mock_vendor_token_data,
     mock_vendor_data,
-    mock_vendor_apply_data,
+    approved_vendor_profile_inject,
 ):
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
 
     assert register_vendor.status_code == 201
-
-    apply_vendor = client.post(
-        "/vendor/apply", json=mock_vendor_apply_data, headers=mock_vendor_token_data
-    )
-
-    assert apply_vendor.status_code == 201
 
     mock_update_product_data["description"] = ""
 
@@ -428,17 +360,11 @@ def test_update_product_price_validation_error(
     mock_update_product_data,
     mock_vendor_token_data,
     mock_vendor_data,
-    mock_vendor_apply_data,
+    approved_vendor_profile_inject,
 ):
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
 
     assert register_vendor.status_code == 201
-
-    apply_vendor = client.post(
-        "/vendor/apply", json=mock_vendor_apply_data, headers=mock_vendor_token_data
-    )
-
-    assert apply_vendor.status_code == 201
 
     mock_update_product_data["price"] = -1
 
@@ -456,17 +382,11 @@ def test_update_product_tags_validation_error(
     mock_update_product_data,
     mock_vendor_token_data,
     mock_vendor_data,
-    mock_vendor_apply_data,
+    approved_vendor_profile_inject,
 ):
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
 
     assert register_vendor.status_code == 201
-
-    apply_vendor = client.post(
-        "/vendor/apply", json=mock_vendor_apply_data, headers=mock_vendor_token_data
-    )
-
-    assert apply_vendor.status_code == 201
 
     mock_update_product_data["tags"] = [i for i in ("a" * 15)]
 
@@ -484,17 +404,11 @@ def test_update_product_sustainability_attributes_validation_error(
     mock_update_product_data,
     mock_vendor_token_data,
     mock_vendor_data,
-    mock_vendor_apply_data,
+    approved_vendor_profile_inject,
 ):
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
 
     assert register_vendor.status_code == 201
-
-    apply_vendor = client.post(
-        "/vendor/apply", json=mock_vendor_apply_data, headers=mock_vendor_token_data
-    )
-
-    assert apply_vendor.status_code == 201
 
     mock_update_product_data["sustainability_attributes"] = [i for i in ("a" * 10)]
 
@@ -512,17 +426,11 @@ def test_update_product_stock_validation_error(
     mock_update_product_data,
     mock_vendor_token_data,
     mock_vendor_data,
-    mock_vendor_apply_data,
+    approved_vendor_profile_inject,
 ):
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
 
     assert register_vendor.status_code == 201
-
-    apply_vendor = client.post(
-        "/vendor/apply", json=mock_vendor_apply_data, headers=mock_vendor_token_data
-    )
-
-    assert apply_vendor.status_code == 201
 
     mock_update_product_data["stock_quantity"] = -1
 
@@ -540,17 +448,11 @@ def test_update_product_order_quantity_validation_error(
     mock_update_product_data,
     mock_vendor_token_data,
     mock_vendor_data,
-    mock_vendor_apply_data,
+    approved_vendor_profile_inject,
 ):
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
 
     assert register_vendor.status_code == 201
-
-    apply_vendor = client.post(
-        "/vendor/apply", json=mock_vendor_apply_data, headers=mock_vendor_token_data
-    )
-
-    assert apply_vendor.status_code == 201
 
     mock_update_product_data["min_order_quantity"] = 0
 
@@ -568,17 +470,11 @@ def test_update_product_not_vendor(
     mock_update_product_data,
     mock_vendor_token_data,
     mock_vendor_data,
-    mock_vendor_apply_data,
+    approved_vendor_profile_inject,
 ):
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
 
     assert register_vendor.status_code == 201
-
-    apply_vendor = client.post(
-        "/vendor/apply", json=mock_vendor_apply_data, headers=mock_vendor_token_data
-    )
-
-    assert apply_vendor.status_code == 201
 
     product = client.put(
         "/products/2", json=mock_update_product_data, headers=mock_vendor_token_data
@@ -596,18 +492,12 @@ def test_delete_product(
     client,
     mock_vendor_token_data,
     mock_vendor_data,
-    mock_vendor_apply_data,
     products_data_inject,
+    approved_vendor_profile_inject,
 ):
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
 
     assert register_vendor.status_code == 201
-
-    apply_vendor = client.post(
-        "/vendor/apply", json=mock_vendor_apply_data, headers=mock_vendor_token_data
-    )
-
-    assert apply_vendor.status_code == 201
 
     product = client.delete("/products/1", headers=mock_vendor_token_data)
 
@@ -622,18 +512,12 @@ def test_delete_product_not_vendor(
     client,
     mock_vendor_token_data,
     mock_vendor_data,
-    mock_vendor_apply_data,
     products_data_inject,
+    approved_vendor_profile_inject,
 ):
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
 
     assert register_vendor.status_code == 201
-
-    apply_vendor = client.post(
-        "/vendor/apply", json=mock_vendor_apply_data, headers=mock_vendor_token_data
-    )
-
-    assert apply_vendor.status_code == 201
 
     product = client.delete("/products/2", headers=mock_vendor_token_data)
 
