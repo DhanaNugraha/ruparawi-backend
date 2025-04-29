@@ -17,6 +17,7 @@ def create_app(config_module = "config.local"):
     app.register_blueprint(router.products_router)
     app.register_blueprint(router.admin_router)
     app.register_blueprint(router.vendor_router)
+    app.register_blueprint(router.order_router)
     return app
 
 
