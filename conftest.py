@@ -242,6 +242,28 @@ def admin_log_data_inject(test_app):
     
 
 @pytest.fixture
+def cart_item_data_inject(test_app):
+    cart_item_data = [
+        {
+            "id": 1,
+            "cart_id": 1,
+            "product_id": 1,
+            "quantity": 2,
+        },
+    ]
+    with test_app.app_context():
+        cart_item_list = []
+        for cart_item in cart_item_data:
+            cart_item_model = models.CartItem(**cart_item)
+            cart_item_list.append(cart_item_model)
+
+        _db.session.add_all(cart_item_list)
+        _db.session.commit()
+
+        return cart_item_list
+    
+
+@pytest.fixture
 def mock_user_data():
     return {
         "username": "eco_buyer",
@@ -353,7 +375,6 @@ def mock_subcategory_data():
         "parent_category_id": 2
     }
 
-
 @pytest.fixture
 def mock_update_category_data():
     return {
@@ -376,3 +397,11 @@ def mock_vendor_apply_data():
 @pytest.fixture
 def mock_admin_vendor_review_data():
     return {"action": "approve", "reason": "testing"}
+
+@pytest.fixture
+def mock_add_cart_item():
+    return {"product_id": 1, "quantity": 1}
+
+@pytest.fixture
+def mock_update_cart_item():
+    return {"product_id": 1, "quantity": 5}
