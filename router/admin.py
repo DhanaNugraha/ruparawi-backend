@@ -5,7 +5,6 @@ from auth.auth import super_admin_required, admin_required
 from conftest import db
 from repo.admin import log_admin_action_repo
 from views.admin import create_article_view, create_category_view, delete_article_view, get_article_by_id_view, get_articles_view, soft_delete_category_view, update_article_view, update_category_view
-from schemas.article import ArticleCreate
 
 admin_router = Blueprint("admin_router", __name__, url_prefix="/admin")
 
