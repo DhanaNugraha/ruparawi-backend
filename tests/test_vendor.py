@@ -227,7 +227,7 @@ def test_get_vendor_profile(client, mock_user_data, mock_token_data, approved_ve
 
     assert get_vendor_profile.status_code == 200
     assert get_vendor_profile.json["success"] is True
-    assert len(get_vendor_profile.json["vendor"]) == 9
+    assert len(get_vendor_profile.json["vendor"]) == 10
 
 
 # ----------------------------------------------------------------------------- Get vendor products -----------------------------------------------------------

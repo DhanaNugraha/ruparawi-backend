@@ -216,6 +216,32 @@ def pending_vendor_profile_inject(test_app):
     
 
 @pytest.fixture
+def admin_log_data_inject(test_app):
+    admin_log_data = [
+        {
+            "id": 1,
+            "admin_id": 1,
+            "action": "POST /admin/category",
+        },
+        {
+            "id": 2,
+            "admin_id": 1,
+            "action": "PUT /admin/category/9",
+        },
+    ]
+    with test_app.app_context():
+        admin_log_list = []
+        for admin_log in admin_log_data:
+            admin_log_model = models.AdminLog(**admin_log)
+            admin_log_list.append(admin_log_model)
+
+        _db.session.add_all(admin_log_list)
+        _db.session.commit()
+
+        return admin_log_list
+    
+
+@pytest.fixture
 def mock_user_data():
     return {
         "username": "eco_buyer",
@@ -249,14 +275,6 @@ def mock_update_user_data():
 def mock_vendor_data():
     return {
         "username": "eco_seller",
-        "email": "seller@example.com",
-        "password": "sustainable123",
-    }
-
-
-@pytest.fixture
-def mock_vendor_login_data():
-    return {
         "email": "seller@example.com",
         "password": "sustainable123",
     }
