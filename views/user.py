@@ -48,7 +48,6 @@ def update_user_profile_view(user, user_request):
             }
         ), 400
 
-    # not sure how to test
     except Exception as e:
         db.session.rollback()
         return jsonify(

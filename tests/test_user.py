@@ -111,7 +111,7 @@ def test_update_user_profile_image_error(
     assert update_user.status_code == 200
 
 
-def test_update_user_validation_error(
+def test_update_user_image_url_validation_error(
     client, mock_user_data, mock_token_data, mock_update_user_data
 ):
     register_user = client.post("/auth/register", json=mock_user_data)
@@ -119,6 +119,24 @@ def test_update_user_validation_error(
     assert register_user.status_code == 201
 
     mock_update_user_data["profile_image_url"] = "test"
+
+    update_user = client.put(
+        "/user/me", json=mock_update_user_data, headers=mock_token_data
+    )
+
+    assert update_user.status_code == 400
+    assert update_user.json["success"] is False
+    assert update_user.json["location"] == "view update user profile request validation"
+
+
+def test_update_user_password_validation_error(
+    client, mock_user_data, mock_token_data, mock_update_user_data
+):
+    register_user = client.post("/auth/register", json=mock_user_data)
+
+    assert register_user.status_code == 201
+
+    mock_update_user_data["password"] = "" 
 
     update_user = client.put(
         "/user/me", json=mock_update_user_data, headers=mock_token_data

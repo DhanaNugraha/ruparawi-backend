@@ -1,4 +1,3 @@
-import models
 
 # uv run pytest -v -s --cov=.
 # uv run pytest tests/test_order.py -v -s --cov=.
