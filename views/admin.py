@@ -1,6 +1,6 @@
 from flask import jsonify
 from flask_jwt_extended import current_user
-from models.articles import Article
+from models.article import Article
 from pydantic import ValidationError
 from instance.database import db
 from models.user import VendorStatus
@@ -11,8 +11,7 @@ from repo.admin import (
   get_article_by_id_repo, 
   soft_delete_category_repo, 
   update_category_repo,
-  get_admin_logs_repo,
-  update_category_repo,
+  get_admin_logs_repo,)
 from repo.vendor import (
     get_vendors_repo,
     process_vendor_application_repo,

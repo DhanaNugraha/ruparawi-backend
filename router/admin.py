@@ -1,8 +1,6 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, request
 from flask_jwt_extended import current_user, jwt_required
-from jsonschema import ValidationError
 from auth.auth import admin_required
-from conftest import db
 from repo.admin import log_admin_action_repo
 from views.admin import (
   create_article_view, 

@@ -1,7 +1,7 @@
 from instance.database import db
 from models.product import ProductCategory
 from models.user import AdminLog, User
-from models.articles import Article
+from models.article import Article
 from repo.product import get_category_by_id_repo
 from shared.time import now, datetime_from_string
 
