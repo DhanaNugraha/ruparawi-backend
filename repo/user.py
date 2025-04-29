@@ -50,6 +50,9 @@ def update_user_repo(user, user_data):
     if user_data.last_name:
         user.last_name = user_data.last_name
 
+    if user_data.password:
+        user.password = user_data.password
+
     db.session.commit()
 
 
