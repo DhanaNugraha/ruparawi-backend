@@ -164,6 +164,84 @@ def category_data_inject(test_app):
     
 
 @pytest.fixture
+def approved_vendor_profile_inject(test_app):
+    vendor_profile_data = [
+        {
+            "user_id": 1,
+            "vendor_status" : "approved",
+            "business_name": "Eco Foods",
+            "business_email": "vendor@ecofoods.com",
+            "business_phone": "+1234567890",
+            "business_address": "123 Green St, Eco City",
+            "business_description": "Organic food supplier",
+            "business_logo_url" : "https://example.com/profile.jpg"
+        },
+    ]
+    with test_app.app_context():
+        vendor_profile_list = []
+        for vendor_profile in vendor_profile_data:
+            vendor_profile_model = models.VendorProfile(**vendor_profile)
+            vendor_profile_list.append(vendor_profile_model)
+
+        _db.session.add_all(vendor_profile_list)
+        _db.session.commit()
+
+        return vendor_profile_list
+    
+
+@pytest.fixture
+def pending_vendor_profile_inject(test_app):
+    vendor_profile_data = [
+        {
+            "user_id": 1,
+            "vendor_status": "pending",
+            "business_name": "Eco Foods",
+            "business_email": "vendor@ecofoods.com",
+            "business_phone": "+1234567890",
+            "business_address": "123 Green St, Eco City",
+            "business_description": "Organic food supplier",
+            "business_logo_url": "https://example.com/profile.jpg",
+        },
+    ]
+    with test_app.app_context():
+        vendor_profile_list = []
+        for vendor_profile in vendor_profile_data:
+            vendor_profile_model = models.VendorProfile(**vendor_profile)
+            vendor_profile_list.append(vendor_profile_model)
+
+        _db.session.add_all(vendor_profile_list)
+        _db.session.commit()
+
+        return vendor_profile_list
+    
+
+@pytest.fixture
+def admin_log_data_inject(test_app):
+    admin_log_data = [
+        {
+            "id": 1,
+            "admin_id": 1,
+            "action": "POST /admin/category",
+        },
+        {
+            "id": 2,
+            "admin_id": 1,
+            "action": "PUT /admin/category/9",
+        },
+    ]
+    with test_app.app_context():
+        admin_log_list = []
+        for admin_log in admin_log_data:
+            admin_log_model = models.AdminLog(**admin_log)
+            admin_log_list.append(admin_log_model)
+
+        _db.session.add_all(admin_log_list)
+        _db.session.commit()
+
+        return admin_log_list
+    
+
+@pytest.fixture
 def mock_user_data():
     return {
         "username": "eco_buyer",
@@ -197,14 +275,6 @@ def mock_update_user_data():
 def mock_vendor_data():
     return {
         "username": "eco_seller",
-        "email": "seller@example.com",
-        "password": "sustainable123",
-    }
-
-
-@pytest.fixture
-def mock_vendor_login_data():
-    return {
         "email": "seller@example.com",
         "password": "sustainable123",
     }
@@ -302,3 +372,7 @@ def mock_vendor_apply_data():
         "business_description": "Organic food supplier",
         "business_logo_url": "https://example.com/profile.jpg",
     }
+
+@pytest.fixture
+def mock_admin_vendor_review_data():
+    return {"action": "approve", "reason": "testing"}

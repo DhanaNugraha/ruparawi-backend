@@ -141,3 +141,9 @@ def get_category_by_id_repo(category_id):
         db.select(ProductCategory).filter_by(id=category_id),
         description=f"Category does not exist '{category_id}'.",
     )
+
+def get_vendor_products_repo(user_id):
+    products = db.select(Product).filter_by(vendor_id=user_id)
+
+    paginated_products = db.paginate(products)
+    return paginated_products

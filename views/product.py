@@ -102,7 +102,7 @@ def list_products_view(request_args):
                     "per_page": paginated_product.per_page,
                 },
             }
-        )
+        ), 200
 
     except ValidationError as e:
         return jsonify(

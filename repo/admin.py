@@ -42,7 +42,7 @@ def create_category_repo(category_data):
         name=category_data.name,
         description=category_data.description,
         parent_category_id=category_data.parent_category_id,
-        is_active=True
+        is_active=True,
     )
 
     db.session.add(category)
@@ -77,6 +77,7 @@ def soft_delete_category_repo(category_id):
     db.session.commit()
     return category
 
+
 def create_article_repo(title, content, author_id):
     article = Article(
         title=title,
@@ -87,6 +88,7 @@ def create_article_repo(title, content, author_id):
     db.session.commit()
     return article
 
+  
 def get_article_by_id_repo(article_id):
     try:
         article = Article.query.get(article_id)
@@ -95,3 +97,8 @@ def get_article_by_id_repo(article_id):
         return article
     except Exception as e:
         raise Exception(f"Error while fetching article by ID: {str(e)}")
+
+        
+def get_admin_logs_repo():
+    return db.paginate(db.select(AdminLog))
+

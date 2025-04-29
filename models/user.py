@@ -29,7 +29,6 @@ class User(db.Model, BaseModel):
     last_name = db.Column(db.String(50))
     profile_image_url = db.Column(db.String(255))
     bio = db.Column(db.Text)
-    vendor_status = db.Column(db.String(20))
     last_login = db.Column(db.DateTime)
     role = db.Column(db.String(20), default=UserRole.BUYER.value)
 
@@ -99,6 +98,7 @@ class VendorProfile(db.Model):
     user_id = db.Column(
         db.Integer, db.ForeignKey("users.id"), nullable=False, primary_key=True
     )
+    vendor_status = db.Column(db.String(20))
     business_name = db.Column(db.String(100), nullable=False)
     business_description = db.Column(db.Text)
     business_address = db.Column(db.String(200))
@@ -120,7 +120,7 @@ class AdminUser(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), primary_key=True)
     access_level = db.Column(db.String(20))  #  super, admin
 
-    # Relationships to separate user admin and granter id
+    # Relationships
     user = db.relationship(
         "User",
         foreign_keys=[user_id],
