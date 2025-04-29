@@ -290,7 +290,8 @@ def mock_update_user_data():
         "bio": "test update bio",
         "first_name": "test update first name",
         "last_name": "test update last name",
-        "profile_image_url": "https://example.com/profile.jpg"
+        "profile_image_url": "https://example.com/profile.jpg",
+        "password": "updated123",
     }
 
 @pytest.fixture

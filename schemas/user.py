@@ -29,6 +29,7 @@ class UserProfileUpdateRequest(BaseModel):
     profile_image_url: str | None = None
     first_name: str | None = None
     last_name: str | None = None
+    password: str | None = None
 
     @field_validator("bio")
     def validate_bio(cls, value):
@@ -60,6 +61,13 @@ class UserProfileUpdateRequest(BaseModel):
             raise ValueError("URL too long (max 500 chars)")
 
         return value.strip()
+    
+    @field_validator("password")
+    def validate_password(cls, value):
+        if len(value) < 8:
+            raise ValueError("Password must be at least 8 characters")
+
+        return value
 
     model_config = ConfigDict(
         from_attributes=True,  # Can read SQLAlchemy model
