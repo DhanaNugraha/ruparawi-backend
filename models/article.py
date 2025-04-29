@@ -1,9 +1,7 @@
-from flask_sqlalchemy import SQLAlchemy
+from instance.database import db
 from models.base import BaseModel
 
-db = SQLAlchemy()
-
-class Article(BaseModel):
+class Article(db.Model, BaseModel):
     __tablename__ = 'articles'
 
     title = db.Column(db.String(255), nullable=False)

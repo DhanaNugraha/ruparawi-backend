@@ -1,6 +1,5 @@
 from instance.database import db
 from models.order import ShoppingCart, CartItem
-from models.product import Product
 from sqlalchemy.orm import contains_eager
 
 
