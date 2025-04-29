@@ -98,6 +98,7 @@ class VendorCreateRequest(BaseModel):
 
 
 class VendorProfileResponse(BaseModel):
+    user_id: int
     business_name: str
     business_email: str
     business_phone: str
