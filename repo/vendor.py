@@ -22,8 +22,25 @@ def vendor_register_repo(user, vendor_data_validated):
 
 def vendor_profile_by_user_id_repo(user_id):
     return db.one_or_404(
-        db.select(VendorProfile).filter_by(user_id=user_id), description=f"No vendor with id '{user_id}'.",
+        db.select(VendorProfile).filter_by(user_id=user_id),
+        description=f"No vendor with id '{user_id}'.",
     )
+
+
+def get_vendors_repo():
+    pending_vendors = db.paginate(
+        db.select(VendorProfile).filter_by(vendor_status=VendorStatus.PENDING.value)
+    )
+
+    approved_vendors = db.paginate(
+        db.select(VendorProfile).filter_by(vendor_status=VendorStatus.APPROVED.value)
+    )
+
+    rejected_vendors = db.paginate(
+        db.select(VendorProfile).filter_by(vendor_status=VendorStatus.REJECTED.value)
+    )
+
+    return (pending_vendors, approved_vendors, rejected_vendors)
 
 
 def process_vendor_application_repo(vendor_profile, review_request_validated):

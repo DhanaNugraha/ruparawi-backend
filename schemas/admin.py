@@ -1,3 +1,4 @@
+from datetime import datetime
 import re
 from typing import List, Optional
 from pydantic import BaseModel, ConfigDict, field_validator
@@ -86,6 +87,18 @@ class VendorApprovalRequest(BaseModel):
             raise ValueError("reason cannot exceed 500 characters")
         
         return value
+
+    model_config = ConfigDict(
+        from_attributes=True,  # Can read SQLAlchemy model
+        extra="ignore",  # ignore extra fields
+    )
+
+
+class AdminLogsResponse(BaseModel):
+    id: int
+    admin_id: int
+    action: str
+    timestamp: datetime
 
     model_config = ConfigDict(
         from_attributes=True,  # Can read SQLAlchemy model

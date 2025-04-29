@@ -119,7 +119,7 @@ class AdminUser(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), primary_key=True)
     access_level = db.Column(db.String(20))  #  super, admin
 
-    # Relationships to separate user admin and granter id
+    # Relationships
     user = db.relationship(
         "User",
         foreign_keys=[user_id],
