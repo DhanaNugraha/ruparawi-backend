@@ -77,6 +77,15 @@ def soft_delete_category_repo(category_id):
     db.session.commit()
     return category
 
+def create_article_repo(title, content, author_id):
+    article = Article(
+        title=title,
+        content=content,
+        author_id=author_id
+    )
+    db.session.add(article)
+    db.session.commit()
+    return article
 
 def get_article_by_id_repo(article_id):
     try:

@@ -1,9 +1,9 @@
 from flask import jsonify
 from flask_jwt_extended import current_user
-from models.article import Article
+from models.articles import Article
 from pydantic import ValidationError
 from instance.database import db
-from repo.admin import check_parent_category_repo, create_category_repo, get_article_by_id_repo, soft_delete_category_repo, update_category_repo, get_all_articles_repo
+from repo.admin import check_parent_category_repo, create_article_repo, create_category_repo, get_article_by_id_repo, soft_delete_category_repo, update_category_repo
 from schemas.admin import CategoryCreate, CategoryResponse, CategoryUpdate, CategoryUpdateResponse
 
 # ------------------------------------------------------ Create Category --------------------------------------------------
@@ -147,14 +147,7 @@ def create_article_view(data):
                 "location": "view create article validation"
             }), 400
         
-        new_article = Article(
-            title=title,
-            content=content,
-            author_id=current_user.id
-        )
-
-        db.session.add(new_article)
-        db.session.commit()
+        new_article = create_article_repo(title, content, current_user.id)
 
         return jsonify({
             "success": True,
