@@ -37,6 +37,7 @@ def cors_setup(app):
             response.headers["Access-Control-Allow-Credentials"] = "true"
 
         response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS, PUT, DELETE"
-        response.headers["Access-Control-Allow-Headers"] = "Content-Type"
-
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+        
         return response
+
