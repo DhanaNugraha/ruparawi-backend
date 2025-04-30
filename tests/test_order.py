@@ -2,6 +2,7 @@
 # uv run pytest -v -s --cov=.
 # uv run pytest tests/test_order.py -v -s --cov=.
 
+# change test for out of stock to the new one for both inactive and out of stock
 
 # ---------------------------------------------------------------------------- Get cart test ----------------------------------------------------------------------------
 

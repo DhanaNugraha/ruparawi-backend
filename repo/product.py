@@ -142,8 +142,19 @@ def get_category_by_id_repo(category_id):
         description=f"Category does not exist '{category_id}'.",
     )
 
+
 def get_vendor_products_repo(user_id):
     products = db.select(Product).filter_by(vendor_id=user_id)
 
     paginated_products = db.paginate(products)
     return paginated_products
+
+
+def verify_product_repo(product, requested_quantity):
+    if product.stock_quantity < requested_quantity:
+        return ("Not enough stock", False)
+
+    if product.is_active is False:
+        return ("Product is inactive", False)
+
+    return ("", True)
