@@ -32,10 +32,7 @@ def cors_setup(app):
     def add_cors_headers(response):
         origin = request.headers.get("Origin")
 
-        print(origin, "origin")
-
         if origin and origin in ALLOWED_ORIGINS:
-            print("origin in ALLOWED_ORIGINS")
             response.headers["Access-Control-Allow-Origin"] = origin
             response.headers["Access-Control-Allow-Credentials"] = "true"
 
