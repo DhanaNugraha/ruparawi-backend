@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import List
 from pydantic import BaseModel, ConfigDict, field_validator
 import re
 
@@ -98,6 +99,14 @@ class UserLoginRequest(BaseModel):
 
 # -------------------------------------------------- User Profile --------------------------------------------------
 
+class UserRoleResponse(BaseModel):
+    name: str
+
+    # pydantic can read ORM objects with this
+    model_config = ConfigDict(
+        from_attributes=True,  # Can read SQLAlchemy model
+        extra="ignore",  # ignore extra fields
+    )
 
 class UserProfileResponse(BaseModel):
     id: int
@@ -107,12 +116,16 @@ class UserProfileResponse(BaseModel):
     last_name: str | None
     profile_image_url: str | None
     bio: str | None
-    role: str
+    role: List[UserRoleResponse]
     last_login: datetime | None
     created_at: datetime
+     
 
     # pydantic can read ORM objects with this
     model_config = ConfigDict(
         from_attributes=True,  # Can read SQLAlchemy model
         extra="ignore",  # ignore extra fields
     )
+
+
+

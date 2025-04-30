@@ -1,9 +1,17 @@
 import re
+from typing import List
 from pydantic import BaseModel, ConfigDict, field_validator
 from datetime import datetime
 
 # -------------------------------------------------- Register User --------------------------------------------------
+class UserRoleResponse(BaseModel):
+    name: str
 
+    # pydantic can read ORM objects with this
+    model_config = ConfigDict(
+        from_attributes=True,  # Can read SQLAlchemy model
+        extra="ignore",  # ignore extra fields
+    )
 
 class PublicUserProfileResponse(BaseModel):
     id: int
@@ -12,7 +20,7 @@ class PublicUserProfileResponse(BaseModel):
     last_name: str | None
     profile_image_url: str | None
     bio: str | None
-    role: str
+    role: List[UserRoleResponse]
     created_at: datetime
 
     model_config = ConfigDict(

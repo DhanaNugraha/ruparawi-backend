@@ -12,16 +12,6 @@ from schemas.vendor import VendorCreateRequest, VendorProfileResponse
 
 def vendor_register_view(user, vendor_request):
     try:
-        # Prevent duplicate applications
-        if user.role == UserRole.VENDOR.value:
-            vendor_profile = user.vendor_profile
-
-            return jsonify(
-                {
-                    "message": "Vendor already registered",
-                    "status": vendor_profile.vendor_status,
-                }
-            ), 400
 
         vendor_data_validated = VendorCreateRequest.model_validate(vendor_request)
 

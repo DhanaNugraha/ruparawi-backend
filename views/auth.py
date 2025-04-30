@@ -79,7 +79,6 @@ def user_login_view(user_request):
         additional_claims={
             "username": user.username,
             "email": user.email,
-            "role" : user.role
         },
     )
 
@@ -88,7 +87,6 @@ def user_login_view(user_request):
         additional_claims={
             "username": user.username,
             "email": user.email,
-            "role" : user.role
         },
     )
 
@@ -104,7 +102,6 @@ def user_login_view(user_request):
                 "id": user.id,
                 "email": user.email,
                 "username": user.username,
-                "role": user.role
             },
         }
     ), 200
@@ -128,7 +125,6 @@ def refresh_token_view(user):
         additional_claims={
             "username": user.username,
             "email": user.email,
-            "role": user.role,
         },
     )
     return jsonify(access_token=access_token), 200
