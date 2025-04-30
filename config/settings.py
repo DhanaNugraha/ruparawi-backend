@@ -30,9 +30,12 @@ def cors_setup(app):
 
     @app.after_request
     def add_cors_headers(response):
-        origin = request.headers.get("Origin", '')
+        origin = request.headers.get("Origin")
 
-        if origin in ALLOWED_ORIGINS:
+        print(origin, "origin")
+
+        if origin and origin in ALLOWED_ORIGINS:
+            print("origin in ALLOWED_ORIGINS")
             response.headers["Access-Control-Allow-Origin"] = origin
             response.headers["Access-Control-Allow-Credentials"] = "true"
 
@@ -41,3 +44,8 @@ def cors_setup(app):
         
         return response
 
+    # Explicitly handle OPTIONS requests for preflight
+    @app.route("/", defaults={"path": ""}, methods=["OPTIONS"])
+    @app.route("/<path:path>", methods=["OPTIONS"])
+    def handle_options(path):
+        return "", 204  # No content response for preflight
