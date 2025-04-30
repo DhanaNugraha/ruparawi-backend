@@ -1,9 +1,11 @@
+import uuid
 from flask import jsonify
 from pydantic import ValidationError
 from instance.database import db
-from repo.order import add_item_to_shopping_cart_repo, delete_shopping_cart_item_repo, get_cart_items_repo, get_shopping_cart_repo, update_shopping_cart_item_repo
-from repo.product import get_product_detail_repo
-from schemas.order import AddCartItemResponse, CartItemResponse, CartResponse, CartItemUpdate, CartItemCreate
+from repo.order import add_item_to_shopping_cart_repo, add_order_status_history_repo, checkout_order_repo, clear_shopping_cart_item_repo, delete_shopping_cart_item_repo, get_cart_items_repo, get_cart_with_items_and_product_repo, get_order_repo, get_shopping_cart_repo, process_order_items, update_order_status_repo, update_shopping_cart_item_repo
+from repo.product import get_product_detail_repo, verify_product_repo
+from schemas.order import AddCartItemResponse, CartItemResponse, CartResponse, CartItemUpdate, CartItemCreate, OrderCreate, OrderResponse, OrderStatusUpdate
+from shared.time import now
 
 
 # ------------------------------------------------------ Get shopping cart --------------------------------------------------
@@ -169,5 +171,149 @@ def delete_shopping_cart_item_view(user, product_id):
                 "message": str(e),
                 "success": False, 
                 "location": "view delete item in cart repo",
+            }
+        ), 500
+
+
+# ------------------------------------------------------ Checkout order --------------------------------------------------
+
+
+def checkout_order_view(user, order_request):
+    try:
+        order_data_validated = OrderCreate.model_validate(order_request)
+
+        # get cart with items and product
+        cart = get_cart_with_items_and_product_repo(user.id)
+
+        # Generate unique order number
+        order_number = generate_order_number()
+
+        # Create order
+        order = checkout_order_repo(cart, order_data_validated, user.id, order_number)
+
+        # convert cart items to order items
+        for item in cart.items:
+            product = item.product
+
+            # Recheck product stock and status
+            issue, status = verify_product_repo(product, item.quantity)
+
+            if status is False:
+                return jsonify(
+                    {
+                        "message": f"{product.name} cannot be ordered",
+                        "issue": issue,
+                        "success": False,
+                    }
+                ), 400
+
+            # create order item, update product stock, update order total amount
+            process_order_items(order, item, product)
+
+            # delete cart item
+            clear_shopping_cart_item_repo(item)
+
+        # add order status history
+        add_order_status_history_repo(order, user.id)
+
+        # commit
+        db.session.commit()
+
+        return jsonify(
+            {
+                "message": "Order checked out successfully",
+                "order": OrderResponse.model_validate(order).model_dump(),
+                "success": True,
+            }
+        ), 201
+
+    except ValidationError as e:
+        return jsonify(
+            {
+                "message": str(e),
+                "success": False,
+                "location": "view checkout order request validation",
+            }
+        ), 400
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify(
+            {
+                "message": str(e),
+                "success": False,
+                "location": "view checkout order repo",
+            }
+        ), 500
+
+
+def generate_order_number():
+    # Format: YYMMDD + first 12 chars of UUID = 18 characters total
+    date_part = now().strftime("%y%m%d")
+    uuid_part = str(uuid.uuid4().hex)[:12].upper()
+    return f"{date_part}{uuid_part}"  # Example: "240523A1B2C3D4E5F6"
+
+
+# ------------------------------------------------------ Get order --------------------------------------------------
+
+
+def get_order_view(user, order_number):
+    try:
+        order = get_order_repo(user, order_number)
+
+        return jsonify(
+            {
+                "message": "Order fetched successfully",
+                "order": OrderResponse.model_validate(order).model_dump(),
+                "success": True,
+            }
+        ), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify(
+            {
+                "message": str(e),
+                "success": False,
+                "location": "view get order repo",
+            }
+        ), 500
+
+
+# ------------------------------------------------------ Update item in cart --------------------------------------------------
+
+
+def update_order_status_view(user, order_status_request, order_number):
+    try:
+        order_status = OrderStatusUpdate.model_validate(order_status_request)
+
+        order = get_order_repo(user, order_number)
+
+        updated_order = update_order_status_repo(order, order_status, user)
+
+        return jsonify(
+            {
+                "message": "Order status updated successfully",
+                "order": OrderResponse.model_validate(updated_order).model_dump(),
+                "success": True,
+            }
+        ), 200
+
+    except ValidationError as e:
+        return jsonify(
+            {
+                "message": str(e),
+                "success": False,
+                "location": "view update order status request validation",
+            }
+        ), 400
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify(
+            {
+                "message": str(e),
+                "success": False,
+                "location": "view update order status repo",
             }
         ), 500
