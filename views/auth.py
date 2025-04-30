@@ -98,11 +98,7 @@ def user_login_view(user_request):
             "success": True,
             "access_token": access_token,
             "refresh_token": refresh_token,
-            "user": {
-                "id": user.id,
-                "email": user.email,
-                "username": user.username,
-            },
+            "user": UserProfileResponse.model_validate(user).model_dump(),
         }
     ), 200
 
