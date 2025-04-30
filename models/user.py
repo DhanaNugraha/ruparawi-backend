@@ -5,16 +5,19 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from enum import Enum
 
 # -------------------------------------- Enum --------------------------------------
-class UserRole(Enum):
-    BUYER = "buyer"
-    ADMIN = "admin"
-    VENDOR = "vendor"
-
 class VendorStatus(Enum):
     PENDING = "pending"
     APPROVED = "approved"
     REJECTED = "rejected"
 
+
+# -------------------------------------- Association --------------------------------------
+
+users_roles_association = db.Table(
+    "users_roles_association",
+    db.Column("user_id", db.Integer, db.ForeignKey("users.id")),
+    db.Column("role_id", db.Integer, db.ForeignKey("user_roles.id")),
+)
 
 # -------------------------------------- User --------------------------------------
 
@@ -30,7 +33,6 @@ class User(db.Model, BaseModel):
     profile_image_url = db.Column(db.String(255))
     bio = db.Column(db.Text)
     last_login = db.Column(db.DateTime)
-    role = db.Column(db.String(20), default=UserRole.BUYER.value)
 
     # Relationships
     addresses = db.relationship("UserAddress", backref="user", lazy=True)
@@ -44,6 +46,7 @@ class User(db.Model, BaseModel):
         "VendorProfile", backref="user", uselist=False, lazy="joined"
     )
     articles = db.relationship('Article', backref='author', lazy=True)
+    role = db.relationship("UserRole", secondary="users_roles_association", backref="users")
 
 
     @property
@@ -62,6 +65,13 @@ class User(db.Model, BaseModel):
     def update_last_login(self):
         self.last_login = time.now()
         db.session.commit()
+
+
+class UserRole(db.Model):
+    __tablename__ = "user_roles"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(20), unique=True, nullable=False)
 
 
 class UserAddress(db.Model, BaseModel):

@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-from flask_jwt_extended import create_access_token, current_user, jwt_required
+from flask_jwt_extended import current_user, jwt_required
 from views.auth import get_user_view, refresh_token_view, user_login_view, user_register_view
 
 auth_router = Blueprint("auth_router", __name__, url_prefix="/auth")

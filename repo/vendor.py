@@ -14,7 +14,12 @@ def vendor_register_repo(user, vendor_data_validated):
         vendor_status=VendorStatus.PENDING.value,
     )
 
-    user.role = UserRole.VENDOR.value
+    vendor_role = db.one_or_404(
+        db.select(UserRole).filter_by(name="vendor"),
+        description="No role with id 'vendor'.",
+    )
+
+    user.role.append(vendor_role)
 
     db.session.add(vendor_profile)
     db.session.commit()

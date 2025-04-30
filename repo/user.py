@@ -1,5 +1,5 @@
 from instance.database import db
-from models.user import User
+from models.user import User, UserRole
 from shared.time import now, datetime_from_string
 
 def user_by_id_repo(user_id):
@@ -29,6 +29,14 @@ def register_user_repo(user_data):
     new_user.password = user_data.password
 
     db.session.add(new_user)
+
+    buyer_role = db.one_or_404(
+        db.select(UserRole).filter_by(name="buyer"),
+        description="No role with name 'buyer'.",
+    )
+
+    new_user.role.append(buyer_role)
+
     db.session.commit()
 
 
