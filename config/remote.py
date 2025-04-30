@@ -1,3 +1,4 @@
+from datetime import timedelta
 import os
 
 DB_CONNECTION_STRING = os.getenv("DB_CONNECTION_STRING")
@@ -7,4 +8,6 @@ SQLALCHEMY_DATABASE_URI = DB_CONNECTION_STRING
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 
 JWT_ACCESS_TOKEN_EXPIRES = 180
+
+JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
 

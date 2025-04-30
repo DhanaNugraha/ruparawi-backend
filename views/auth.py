@@ -1,5 +1,5 @@
 from flask import jsonify
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, create_refresh_token
 from pydantic import ValidationError
 from instance.database import db
 from repo.user import register_user_repo, update_last_login_repo, user_by_email_repo
@@ -83,6 +83,15 @@ def user_login_view(user_request):
         },
     )
 
+    refresh_token = create_refresh_token(
+        identity=str(user.id),
+        additional_claims={
+            "username": user.username,
+            "email": user.email,
+            "role" : user.role
+        },
+    )
+
     # update last login
     update_last_login_repo(user)
 
@@ -90,6 +99,7 @@ def user_login_view(user_request):
         {
             "success": True,
             "access_token": access_token,
+            "refresh_token": refresh_token,
             "user": {
                 "id": user.id,
                 "email": user.email,
@@ -108,3 +118,17 @@ def get_user_view(user):
     filtered_user_data = UserProfileResponse.model_validate(user)
 
     return jsonify({"success": True, "user": filtered_user_data.model_dump()}), 200
+
+
+# ------------------------------------------------------ Refresh Token --------------------------------------------------
+
+def refresh_token_view(user):
+    access_token = create_access_token(
+        identity=str(user.id),
+        additional_claims={
+            "username": user.username,
+            "email": user.email,
+            "role": user.role,
+        },
+    )
+    return jsonify(access_token=access_token), 200
