@@ -1,5 +1,6 @@
 from instance.database import db
-from models.product import Product, ProductCategory, SustainabilityAttribute, ProductTag
+from models.product import Product, ProductCategory, ProductImage, SustainabilityAttribute, ProductTag, Wishlist
+from sqlalchemy.orm import joinedload
 
 
 def create_product_repo(product_data, user_id):
@@ -77,12 +78,10 @@ def get_products_list_repo(product_filter, request_args):
 
 
 def get_product_detail_repo(product_id):
-    product = db.one_or_404(
+    return db.one_or_404(
         db.select(Product).filter_by(id=product_id),
         description=f"No product with id '{product_id}'.",
     )
-
-    return product
 
 
 def update_product_repo(user_id, product_id, update_data):
@@ -122,6 +121,62 @@ def update_product_repo(user_id, product_id, update_data):
 def soft_delete_product_repo(product):
     product.is_active = False
     db.session.commit()
+
+
+# ----------------------------------------------------------- Wishlist -----------------------------------------------------------
+
+
+def add_product_to_wishlist_by_user_id_repo(user_id, product):
+    wishlist = db.session.execute(
+        db.select(Wishlist).filter_by(user_id=user_id)
+    ).scalar_one_or_none()
+
+    if not wishlist:
+        wishlist = Wishlist(user_id=user_id)
+        db.session.add(wishlist)
+
+    if wishlist.add_product(product):
+        db.session.commit()
+
+        return wishlist
+    
+    else:
+        return None
+    
+
+def remove_product_from_wishlist_repo(wishlist, product):
+    if wishlist.remove_product(product):
+        db.session.commit()
+
+        return wishlist
+    
+    else:
+        return None
+    
+
+def get_wishlist_by_user_id_repo(user_id):
+    return db.one_or_404(
+        db.select(Wishlist).filter_by(user_id=user_id),
+        description=f"No wishlist with user id '{user_id}'.",
+    )
+
+
+# def get_wishlist_with_products_by_user_id_repo(user_id):
+#     return db.session.execute(
+#         db.select(Wishlist)
+#         .options(joinedload(Wishlist.products))
+#         .where(Wishlist.user_id == user_id)
+#     ).scalars().first()
+
+
+def get_product_primary_image_repo(product_id):
+    return db.session.execute(
+        db.select(ProductImage.image_url).filter_by(product_id=product_id, is_primary=True)
+    ).scalar_one_or_none()
+
+
+
+# ----------------------------------------------------------- Categories -----------------------------------------------------------
 
 
 def get_top_level_categories_repo():

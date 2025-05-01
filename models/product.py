@@ -14,6 +14,13 @@ product_sustainability_association = db.Table(
     db.Column("sustainability_attribute_id", db.Integer, db.ForeignKey("sustainability_attributes.id")),
 )
 
+wishlist_association = db.Table(
+    "wishlist_association",
+    db.Column("wishlist_id", db.Integer, db.ForeignKey("wishlists.id"), primary_key=True),
+    db.Column("product_id", db.Integer, db.ForeignKey("products.id"), primary_key=True),
+    db.Column("created_at", db.DateTime, server_default=db.func.now()),
+)
+
 # -------------------------------------------------------
 
 class ProductCategory(db.Model, BaseModel):
@@ -79,5 +86,34 @@ class ProductImage(db.Model, BaseModel):
     is_primary = db.Column(db.Boolean, default=False)
 
 
+class Wishlist(db.Model, BaseModel):
+    __tablename__ = "wishlists"
 
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), unique=True)
+    products = db.relationship(
+        "Product",
+        secondary=wishlist_association,
+        backref=db.backref("wishlisted_by", lazy="dynamic"),
+        lazy="dynamic",
+    )
+
+    def add_product(self, product):
+        if not self.has_product(product):
+            self.products.append(product)
+            return True
+        return False
+
+    def remove_product(self, product):
+        if self.has_product(product):
+            self.products.remove(product)
+            return True
+        return False
+
+    def has_product(self, product):
+        return (
+            self.products.filter(
+                wishlist_association.c.product_id == product.id
+            ).count()
+            > 0
+        )
 

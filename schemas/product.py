@@ -257,3 +257,29 @@ class VendorProductsResponse(BaseModel):
         from_attributes=True,  # Can read SQLAlchemy model
         extra="ignore",  # ignore extra fields
     )
+
+
+# -------------------------------------------------- Wishlist --------------------------------------------------
+
+
+class WishlistProductResponse(BaseModel):
+    id: int
+    name: str
+    price: float
+    average_rating: Optional[float] = None
+    primary_image: Optional[str] = None
+
+    model_config = ConfigDict(
+        from_attributes=True,  # Can read SQLAlchemy model
+        extra="ignore",  # ignore extra fields
+    )
+
+
+class WishlistResponse(BaseModel):
+    products: List[WishlistProductResponse]
+    count: Optional[int]
+
+    model_config = ConfigDict(
+        from_attributes=True,  # Can read SQLAlchemy model
+        extra="ignore",  # ignore extra fields
+    )
