@@ -32,6 +32,10 @@ from .testimonial import (
     VendorTestimonial,
 )
 
+from .product_review import (
+    ProductReview,
+)
+
 __all__ = [
     "User",
     "UserAddress",
@@ -54,4 +58,5 @@ __all__ = [
     "VendorReview",
     "Article",
     "VendorTestimonial",
+    "ProductReview",
 ]
