@@ -58,3 +58,15 @@ def process_vendor_application_repo(vendor_profile, review_request_validated):
         vendor_profile.vendor_status = VendorStatus.REJECTED.value
 
     db.session.commit()
+
+
+def update_vendor_profile_repo(vendor_profile, vendor_data_validated):
+
+    for field, value in vendor_data_validated.model_dump().items():
+        # only update the field if it is not None
+        if value is not None:
+            setattr(vendor_profile, field, value)
+
+    db.session.commit()
+
+    return vendor_profile
