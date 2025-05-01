@@ -3,16 +3,19 @@ from pydantic import ValidationError
 from instance.database import db
 from models.user import UserRole
 from repo.product import get_vendor_products_repo
-from repo.vendor import vendor_register_repo
+from repo.vendor import update_vendor_profile_repo, vendor_register_repo
 from schemas.product import VendorProductsResponse
-from schemas.vendor import VendorCreateRequest, VendorProfileResponse
+from schemas.vendor import (
+    VendorCreateRequest,
+    VendorProfileResponse,
+    VendorUpdateRequest,
+)
 
 # -------------------------------------------------------------- Register Vendor ---------------------------------------------------------------------------
 
 
 def vendor_register_view(user, vendor_request):
     try:
-
         vendor_data_validated = VendorCreateRequest.model_validate(vendor_request)
 
         vendor_register_repo(user, vendor_data_validated)
@@ -68,6 +71,45 @@ def get_vendor_profile_view(user):
                 "location": "view get vendor profile repo",
             }
         ), 500
+    
+
+# -------------------------------------------------------------- Update vendor profile ---------------------------------------------------------------------------
+
+
+def update_vendor_profile_view(user, vendor_request):
+    try:
+        vendor_data_validated = VendorUpdateRequest.model_validate(vendor_request)
+
+        update_vendor_profile_repo(user, vendor_data_validated)
+
+        return jsonify(
+            {
+                "success": True,
+                "message": "Profile updated successfully",
+                "vendor": VendorProfileResponse.model_validate(
+                    user.vendor_profile
+                ).model_dump(),
+            }
+        ), 200
+
+    except ValidationError as e:
+        return jsonify(
+            {
+                "message": str(e),
+                "success": False,
+                "location": "view update vendor profile request validation",
+            }
+        ), 400
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify(
+            {
+                "message": str(e),
+                "success": False,
+                "location": "view update vendor profile repo",
+            }
+        ), 500
 
 
 # -------------------------------------------------------------- Get vendor products ---------------------------------------------------------------------------
@@ -103,3 +145,5 @@ def get_vendor_products_view(user):
                 "location": "view get vendor products repo",
             }
         ), 500
+
+
