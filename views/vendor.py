@@ -1,7 +1,6 @@
 from flask import jsonify
 from pydantic import ValidationError
 from instance.database import db
-from models.user import UserRole
 from repo.product import get_vendor_products_repo
 from repo.vendor import update_vendor_profile_repo, vendor_register_repo
 from schemas.product import VendorProductsResponse

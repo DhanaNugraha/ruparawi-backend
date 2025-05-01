@@ -2,13 +2,17 @@ from flask import jsonify
 from pydantic import ValidationError
 from instance.database import db
 from repo.product import (
+    add_product_to_wishlist_by_user_id_repo,
     create_product_repo,
     get_category_by_id_repo,
     get_product_detail_repo,
+    get_product_primary_image_repo,
     get_products_list_repo,
     get_top_level_categories_repo,
+    get_wishlist_by_user_id_repo,
     process_sustainability_repo,
     process_tags_repo,
+    remove_product_from_wishlist_repo,
     soft_delete_product_repo,
     update_product_repo,
 )
@@ -20,7 +24,9 @@ from schemas.product import (
     ProductDetailResponse,
     ProductListFilters,
     ProductListResponse,
-    ProductUpdateRequest,
+    ProductUpdateRequest, 
+    WishlistProductResponse,
+    WishlistResponse
 )
 
 
@@ -242,6 +248,133 @@ def soft_delete_product_view(user, product_id):
                 "location": "view delete product repo",
             }
         ), 500
+    
+
+# ------------------------------------------------------ Add product to wishlist --------------------------------------------------
+
+def add_product_to_wishlist_view(user, product_id):
+    try:
+        # get product
+        product = get_product_detail_repo(product_id)
+
+        wishlist = add_product_to_wishlist_by_user_id_repo(user.id, product)
+
+        if wishlist is None:
+            return jsonify(
+                {
+                    "message": "Product already in wishlist",
+                    "success": False,
+                }
+            ), 404
+
+        return jsonify(
+            {
+                "message": f"{product.name} added to wishlist successfully",
+                "success": True,
+            }
+        ), 200
+        
+    except ValidationError as e:
+        return jsonify(
+            {
+                "message": str(e),
+                "success": False,
+                "location": "view add product to wishlist request validation",
+            }
+        ), 400
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify(
+            {
+                "message": str(e),
+                "success": False,
+                "location": "view add product to wishlist repo",
+            }
+        ), 500
+    
+
+# ------------------------------------------------------ Remove product from wishlist --------------------------------------------------
+
+def remove_product_from_wishlist_view(user, product_id):
+    try:
+        # get product
+        product = get_product_detail_repo(product_id)
+
+        wishlist = get_wishlist_by_user_id_repo(user.id)
+
+        updated_wishlist = remove_product_from_wishlist_repo(wishlist, product)
+
+        if updated_wishlist is None:
+            return jsonify(
+                {
+                    "message": "Product not in wishlist",
+                    "success": False,
+                }
+            ), 404
+        
+        return jsonify(
+            {
+                "message": "Product removed from wishlist successfully",
+                "success": True,
+            }
+        ), 200
+        
+    except ValidationError as e:
+        return jsonify(
+            {
+                "message": str(e),
+                "success": False,
+                "location": "view remove product from wishlist request validation",
+            }
+        ), 400
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify(
+            {
+                "message": str(e),
+                "success": False,
+                "location": "view remove product from wishlist repo",
+            }
+        ), 500
+    
+
+# ------------------------------------------------------ Get wishlist --------------------------------------------------
+
+
+def get_wishlist_view(user):
+    try:
+        wishlist = get_wishlist_by_user_id_repo(user.id)
+
+        wishlist_product_response = []
+
+        for product in wishlist.products.all():
+            primary_image = get_product_primary_image_repo(product.id)
+
+            wishlist_product_response.append(
+                WishlistProductResponse(
+                    primary_image=primary_image,
+                    **ProductDetailResponse.model_validate(product).model_dump(),
+                )
+            )
+
+        wishlist_response = WishlistResponse(
+            products=wishlist_product_response, count=len(wishlist_product_response)
+        )
+
+        return {
+            "success": True,
+            "message": "Wishlist fetched successfully",
+            "wishlist": wishlist_response.model_dump(),
+        }, 200
+
+    except Exception as e:
+        return {
+            "message": str(e),
+            "success": False,
+            "location": "view get wishlist repo",
+        }, 500
 
 
 # ------------------------------------------------------ Get Category Tree --------------------------------------------------
