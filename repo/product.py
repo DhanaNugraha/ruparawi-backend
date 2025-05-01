@@ -20,6 +20,24 @@ def create_product_repo(product_data, user_id):
 
     return product
 
+def process_product_images_repo(primary_image, images_list, product_id):
+    for image_url in images_list:
+        product_image = ProductImage(
+            product_id=product_id,
+            image_url=image_url,
+        )
+
+        db.session.add(product_image)
+
+    product_image = ProductImage(
+        product_id=product_id,
+        image_url=primary_image,
+        is_primary=True
+    )
+
+    db.session.add(product_image)
+
+
 def process_tags_repo(tags_list, product): 
     for tag_name in tags_list:
         tag = db.session.execute(
@@ -161,17 +179,10 @@ def get_wishlist_by_user_id_repo(user_id):
     )
 
 
-# def get_wishlist_with_products_by_user_id_repo(user_id):
-#     return db.session.execute(
-#         db.select(Wishlist)
-#         .options(joinedload(Wishlist.products))
-#         .where(Wishlist.user_id == user_id)
-#     ).scalars().first()
-
-
 def get_product_primary_image_repo(product_id):
     return db.session.execute(
-        db.select(ProductImage.image_url).filter_by(product_id=product_id, is_primary=True)
+        db.select(ProductImage.image_url)
+        .filter_by(product_id=product_id, is_primary=True)
     ).scalar_one_or_none()
 
 

@@ -1,6 +1,7 @@
 from flask import jsonify
 from pydantic import ValidationError
 from instance.database import db
+from models.product import ProductImage
 from repo.product import (
     add_product_to_wishlist_by_user_id_repo,
     create_product_repo,
@@ -10,6 +11,7 @@ from repo.product import (
     get_products_list_repo,
     get_top_level_categories_repo,
     get_wishlist_by_user_id_repo,
+    process_product_images_repo,
     process_sustainability_repo,
     process_tags_repo,
     remove_product_from_wishlist_repo,
@@ -24,9 +26,9 @@ from schemas.product import (
     ProductDetailResponse,
     ProductListFilters,
     ProductListResponse,
-    ProductUpdateRequest, 
+    ProductUpdateRequest,
     WishlistProductResponse,
-    WishlistResponse
+    WishlistResponse,
 )
 
 
@@ -39,6 +41,13 @@ def create_product_view(user, product_request):
 
         # flush product and get product id
         product = create_product_repo(product_data_validated, user.id)
+
+        # add product images to images table
+        process_product_images_repo(
+            product_data_validated.primary_image_url,
+            product_data_validated.images,
+            product.id,
+        )
 
         # add new tags to tags table and append relationship of product to association table
         process_tags_repo(product_data_validated.tags, product)
@@ -91,11 +100,24 @@ def list_products_view(request_args):
             filtered_products_data_validated, request_args
         )
 
-        # serialize data
-        products_response = [
-            ProductListResponse.model_validate(product).model_dump()
-            for product in paginated_product.items
-        ]
+        products_response = []
+
+        for product in paginated_product.items:
+            # get primary image
+            primary_image = get_product_primary_image_repo(product.id)
+
+            # serialize data
+            products_response.append(
+                ProductListResponse(
+                    primary_image_url=primary_image,
+                    id=product.id,
+                    name=product.name,
+                    price=product.price,
+                    category_id=product.category_id,
+                    tags=product.tags,
+                    vendor_id=product.vendor_id,
+                ).model_dump()
+            )
 
         return jsonify(
             {
@@ -132,7 +154,10 @@ def get_product_detail_view(product_id):
     try:
         product = get_product_detail_repo(product_id)
 
-        serialized_product = ProductDetailResponse.model_validate(product).model_dump()
+        # pls check this
+        serialized_product = ProductDetailResponse.model_validate(
+            product
+        ).model_dump()
 
         return jsonify({"success": True, "product": serialized_product}), 200
 
@@ -248,9 +273,10 @@ def soft_delete_product_view(user, product_id):
                 "location": "view delete product repo",
             }
         ), 500
-    
+
 
 # ------------------------------------------------------ Add product to wishlist --------------------------------------------------
+
 
 def add_product_to_wishlist_view(user, product_id):
     try:
@@ -273,7 +299,7 @@ def add_product_to_wishlist_view(user, product_id):
                 "success": True,
             }
         ), 200
-        
+
     except ValidationError as e:
         return jsonify(
             {
@@ -292,9 +318,10 @@ def add_product_to_wishlist_view(user, product_id):
                 "location": "view add product to wishlist repo",
             }
         ), 500
-    
+
 
 # ------------------------------------------------------ Remove product from wishlist --------------------------------------------------
+
 
 def remove_product_from_wishlist_view(user, product_id):
     try:
@@ -312,14 +339,14 @@ def remove_product_from_wishlist_view(user, product_id):
                     "success": False,
                 }
             ), 404
-        
+
         return jsonify(
             {
                 "message": "Product removed from wishlist successfully",
                 "success": True,
             }
         ), 200
-        
+
     except ValidationError as e:
         return jsonify(
             {
@@ -338,7 +365,7 @@ def remove_product_from_wishlist_view(user, product_id):
                 "location": "view remove product from wishlist repo",
             }
         ), 500
-    
+
 
 # ------------------------------------------------------ Get wishlist --------------------------------------------------
 
@@ -384,7 +411,7 @@ def get_category_tree_view():
     try:
         # active categories with no parents
         top_categories = get_top_level_categories_repo()
-        
+
         # build category tree
         categories_tree = []
 
