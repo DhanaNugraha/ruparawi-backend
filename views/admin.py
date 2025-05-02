@@ -5,13 +5,18 @@ from pydantic import ValidationError
 from instance.database import db
 from models.user import VendorStatus
 from repo.admin import (
-  check_parent_category_repo, 
-  create_article_repo, 
-  create_category_repo, 
-  get_article_by_id_repo, 
-  soft_delete_category_repo, 
-  update_category_repo,
-  get_admin_logs_repo,)
+    check_parent_category_repo,
+    create_article_repo,
+    create_category_repo,
+    get_article_by_id_repo,
+    soft_delete_category_repo,
+    update_category_repo,
+    get_admin_logs_repo,
+    create_promotion_repo,
+    update_promotion_repo,
+    add_products_to_promotion_repo,
+    list_all_promotions_repo,
+)
 from repo.vendor import (
     get_vendors_repo,
     process_vendor_application_repo,
@@ -24,7 +29,10 @@ from schemas.admin import (
     CategoryUpdate,
     CategoryUpdateResponse,
     VendorApprovalRequest,
+    PromotionCreate,
+    PromotionUpdate,
 )
+from schemas.product import PromotionDetailResponse, PromotionListResponse
 from schemas.vendor import VendorProfileResponse
 
 
@@ -149,7 +157,7 @@ def soft_delete_category_tree(category_id):
     # soft delete its sub categories as well
     if category.subcategories:
         for sub_category in category.subcategories:
-            soft_delete_category_tree(sub_category.id) 
+            soft_delete_category_tree(sub_category.id)
 
 
 # ------------------------------------------------------ Get all vendors ---------------------------------------------------
@@ -307,8 +315,134 @@ def get_admin_logs_view():
             }
         ), 500
 
-  
- # ------------------------------------------------------ Management Article --------------------------------------------------
+
+# ------------------------------------------------------ Create Promotions --------------------------------------------------
+
+
+def create_promotion_view(promotion_data, user):
+    try:
+        promotion_data_validated = PromotionCreate.model_validate(promotion_data)
+
+        promotion = create_promotion_repo(user.id, promotion_data_validated)
+
+        # process products
+        if promotion_data_validated.product_ids:
+            add_products_to_promotion_repo(
+                promotion, promotion_data_validated.product_ids
+            )
+
+        db.session.commit()
+
+        return jsonify(
+            {
+                "success": True,
+                "message": "Promotion created successfully",
+                "promotion": PromotionDetailResponse.model_validate(promotion).model_dump(),
+            }
+        ), 200
+
+    except ValidationError as e:
+        return jsonify(
+            {
+                "message": str(e),
+                "success": False,
+                "location": "view create promotion request validation",
+            }
+        ), 400
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify(
+            {
+                "success": False,
+                "message": str(e),
+                "location": "view create promotion repo",
+            }
+        ), 500
+
+
+# ------------------------------------------------------ Update Promotion --------------------------------------------------
+
+
+def update_promotion_view(promotion_id, promotion_data):
+    try:
+        promotion_data_validated = PromotionUpdate.model_validate(promotion_data)
+
+        promotion = update_promotion_repo(promotion_id, promotion_data_validated)
+
+        # process products
+        if promotion_data_validated.product_ids:
+            promotion.products.clear()
+
+            add_products_to_promotion_repo(
+                promotion, promotion_data_validated.product_ids
+            )
+
+        db.session.commit()
+
+        return jsonify(
+            {
+                "success": True,
+                "message": "Promotion updated successfully",
+                "promotion": PromotionDetailResponse.model_validate(
+                    promotion
+                ).model_dump(),
+            }
+        )
+
+    except ValidationError as e:
+        return jsonify(
+            {
+                "message": str(e),
+                "success": False,
+                "location": "view update promotion request validation",
+            }
+        ), 400
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify(
+            {
+                "success": False,
+                "message": str(e),
+                "location": "view update promotion repo",
+            }
+        ), 500
+
+
+# ------------------------------------------------------ Get all promotions ---------------------------------------------------
+
+
+def get_all_promotions_view():
+    try:
+        promotions = list_all_promotions_repo()
+
+        promotions_response = [
+            PromotionListResponse.model_validate(promotion).model_dump()
+            for promotion in promotions
+        ]
+
+        return jsonify(
+            {
+                "success": True,
+                "message": "Promotions fetched successfully",
+                "promotions": promotions_response,
+            }
+        ), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify(
+            {
+                "message": str(e),
+                "success": False,
+                "location": "view get all promotions repo",
+            }
+        ), 500
+
+
+# ------------------------------------------------------ Management Article --------------------------------------------------
+
 
 def create_article_view(data):
     try:
@@ -316,55 +450,67 @@ def create_article_view(data):
         content = data.get("content")
 
         if not title or not content:
-            return jsonify({
-                "success": False,
-                "message": "Title and content are required",
-                "location": "view create article validation"
-            }), 400
-        
+            return jsonify(
+                {
+                    "success": False,
+                    "message": "Title and content are required",
+                    "location": "view create article validation",
+                }
+            ), 400
+
         if len(title) > 255:
-            return jsonify({
-                "success": False,
-                "message": "Title must be less than 255 characters",
-                "location": "view create article validation"
-            }), 400
+            return jsonify(
+                {
+                    "success": False,
+                    "message": "Title must be less than 255 characters",
+                    "location": "view create article validation",
+                }
+            ), 400
 
         if len(content) < 500:
-            return jsonify({
-                "success": False,
-                "message": "Content must be at least 500 characters",
-                "location": "view create article validation"
-            }), 400
+            return jsonify(
+                {
+                    "success": False,
+                    "message": "Content must be at least 500 characters",
+                    "location": "view create article validation",
+                }
+            ), 400
 
         if len(content) > 20000:
-            return jsonify({
-                "success": False,
-                "message": "Content must be less than 20000 characters",
-                "location": "view create article validation"
-            }), 400
-        
+            return jsonify(
+                {
+                    "success": False,
+                    "message": "Content must be less than 20000 characters",
+                    "location": "view create article validation",
+                }
+            ), 400
+
         new_article = create_article_repo(title, content, current_user.id)
 
-        return jsonify({
-            "success": True,
-            "message": "Article created successfully",
-            "article": {
-                "id": new_article.id,
-                "title": new_article.title,
-                "content": new_article.content,
-                "author_id": new_article.author_id,
-                "created_at": new_article.created_at.isoformat(),
-                "updated_at": new_article.updated_at.isoformat()
+        return jsonify(
+            {
+                "success": True,
+                "message": "Article created successfully",
+                "article": {
+                    "id": new_article.id,
+                    "title": new_article.title,
+                    "content": new_article.content,
+                    "author_id": new_article.author_id,
+                    "created_at": new_article.created_at.isoformat(),
+                    "updated_at": new_article.updated_at.isoformat(),
+                },
             }
-        }), 201
+        ), 201
 
     except Exception as e:
         db.session.rollback()
-        return jsonify({
-            "success": False,
-            "message": str(e),
-            "location": "view create article repo"
-        }), 500
+        return jsonify(
+            {
+                "success": False,
+                "message": str(e),
+                "location": "view create article repo",
+            }
+        ), 500
 
 
 def get_articles_view():
@@ -377,22 +523,22 @@ def get_articles_view():
                 "content": article.content,
                 "author_id": article.author_id,
                 "created_at": article.created_at.isoformat(),
-                "updated_at": article.updated_at.isoformat()
+                "updated_at": article.updated_at.isoformat(),
             }
             for article in articles
         ]
-        return jsonify({
-            "success": True,
-            "message": "Articles retrieved successfully",
-            "articles": result
-        }), 200
+        return jsonify(
+            {
+                "success": True,
+                "message": "Articles retrieved successfully",
+                "articles": result,
+            }
+        ), 200
 
     except Exception as e:
-        return jsonify({
-            "success": False,
-            "message": str(e),
-            "location": "view get articles repo"
-        }), 500
+        return jsonify(
+            {"success": False, "message": str(e), "location": "view get articles repo"}
+        ), 500
 
 
 def get_article_by_id_view(article_id):
@@ -405,108 +551,121 @@ def get_article_by_id_view(article_id):
             "content": article.content,
             "author_id": article.author_id,
             "created_at": article.created_at.isoformat(),
-            "updated_at": article.updated_at.isoformat()
+            "updated_at": article.updated_at.isoformat(),
         }
 
-        return jsonify({
-            "success": True,
-            "message": "Article retrieved successfully",
-            "article": result
-        }), 200
+        return jsonify(
+            {
+                "success": True,
+                "message": "Article retrieved successfully",
+                "article": result,
+            }
+        ), 200
 
     except Exception as e:
-        return jsonify({
-            "success": False,
-            "message": str(e),
-            "location": "view get article by id"
-        }), 500
+        return jsonify(
+            {"success": False, "message": str(e), "location": "view get article by id"}
+        ), 500
 
 
 def update_article_view(data, article_id):
     try:
         article = Article.query.get(article_id)
         if not article:
-            return jsonify({
-                "success": False,
-                "message": "Article not found",
-                "location": "view update article validation"
-            }), 404
+            return jsonify(
+                {
+                    "success": False,
+                    "message": "Article not found",
+                    "location": "view update article validation",
+                }
+            ), 404
 
         title = data.get("title")
         content = data.get("content")
 
         if title:
             if len(title) > 255:
-                return jsonify({
-                    "success": False,
-                    "message": "Title must be less than 255 characters",
-                    "location": "view update article validation"
-                }), 400
+                return jsonify(
+                    {
+                        "success": False,
+                        "message": "Title must be less than 255 characters",
+                        "location": "view update article validation",
+                    }
+                ), 400
             article.title = title
 
         if content:
             if len(content) < 500:
-                return jsonify({
-                    "success": False,
-                    "message": "Content must be at least 500 characters",
-                    "location": "view update article validation"
-                }), 400
+                return jsonify(
+                    {
+                        "success": False,
+                        "message": "Content must be at least 500 characters",
+                        "location": "view update article validation",
+                    }
+                ), 400
             if len(content) > 20000:
-                return jsonify({
-                    "success": False,
-                    "message": "Content must be less than 20000 characters",
-                    "location": "view update article validation"
-                }), 400
+                return jsonify(
+                    {
+                        "success": False,
+                        "message": "Content must be less than 20000 characters",
+                        "location": "view update article validation",
+                    }
+                ), 400
             article.content = content
 
         db.session.commit()
 
-        return jsonify({
-            "success": True,
-            "message": "Article updated successfully",
-            "article": {
-                "id": article.id,
-                "title": article.title,
-                "content": article.content,
-                "author_id": article.author_id,
-                "created_at": article.created_at.isoformat(),
-                "updated_at": article.updated_at.isoformat()
+        return jsonify(
+            {
+                "success": True,
+                "message": "Article updated successfully",
+                "article": {
+                    "id": article.id,
+                    "title": article.title,
+                    "content": article.content,
+                    "author_id": article.author_id,
+                    "created_at": article.created_at.isoformat(),
+                    "updated_at": article.updated_at.isoformat(),
+                },
             }
-        }), 200
+        ), 200
 
     except Exception as e:
         db.session.rollback()
-        return jsonify({
-            "success": False,
-            "message": str(e),
-            "location": "view update article repo"
-        }), 500
+        return jsonify(
+            {
+                "success": False,
+                "message": str(e),
+                "location": "view update article repo",
+            }
+        ), 500
 
 
 def delete_article_view(article_id):
     try:
         article = Article.query.get(article_id)
         if not article:
-            return jsonify({
-                "success": False,
-                "message": "Article not found",
-                "location": "view delete article validation"
-            }), 404
+            return jsonify(
+                {
+                    "success": False,
+                    "message": "Article not found",
+                    "location": "view delete article validation",
+                }
+            ), 404
 
         db.session.delete(article)
         db.session.commit()
 
-        return jsonify({
-            "success": True,
-            "message": "Article deleted successfully"
-        }), 200
+        return jsonify(
+            {"success": True, "message": "Article deleted successfully"}
+        ), 200
 
     except Exception as e:
         db.session.rollback()
-        return jsonify({
-            "success": False,
-            "message": str(e),
-            "location": "view delete article repo"
-        }), 500
-
-
+        return jsonify(
+            {
+                "success": False,
+                "message": str(e),
+                "location": "view delete article repo",
+            }
+        ), 500

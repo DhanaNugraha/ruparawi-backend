@@ -1,5 +1,15 @@
+from datetime import timezone
+from enum import Enum
 from instance.database import db
+from shared.time import now
 from .base import BaseModel
+
+
+# ------------------------------------- Enum --------------------------------------
+class PromotionType(Enum):
+    PERCENTAGE_DISCOUNT = "percentage_discount"
+    FIXED_DISCOUNT = "fixed_discount"
+
 
 #------------------- assosiation tables for many to many relationship----------------------
 product_tag_association = db.Table(
@@ -19,6 +29,28 @@ wishlist_association = db.Table(
     db.Column("wishlist_id", db.Integer, db.ForeignKey("wishlists.id"), primary_key=True),
     db.Column("product_id", db.Integer, db.ForeignKey("products.id"), primary_key=True),
     db.Column("created_at", db.DateTime, server_default=db.func.now()),
+)
+
+promotion_product_association = db.Table(
+    "promotion_product_association",
+    db.Column(
+        "promotion_id", db.Integer, db.ForeignKey("promotions.id"), primary_key=True
+    ),
+    db.Column("product_id", db.Integer, db.ForeignKey("products.id"), primary_key=True),
+    db.Column("created_at", db.DateTime, default=now()),
+)
+
+promotion_order_association = db.Table(
+    "promotion_order_association",
+    db.Column(
+        "promotion_id", db.Integer, db.ForeignKey("promotions.id"), primary_key=True
+    ),
+    db.Column("order_id", db.Integer, db.ForeignKey("orders.id"), primary_key=True),
+    db.Column(
+        "discount_applied", db.Numeric(10, 2)
+    ),  # Track how much discount was given
+    db.Column("created_at", db.DateTime, server_default=db.func.now()),
+    db.Column("eligible_items", db.Text),
 )
 
 # -------------------------------------------------------
@@ -117,3 +149,43 @@ class Wishlist(db.Model, BaseModel):
             > 0
         )
 
+
+# ------------------------------------------------------- Promotions
+
+
+class Promotion(db.Model, BaseModel):
+    __tablename__ = "promotions"
+
+    title = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text)
+    promo_code = db.Column(db.String(20), unique=True, nullable=False)
+    discount_value = db.Column(db.Numeric(10, 2))  # Percentage or fixed amount
+    promotion_type = db.Column(db.String(25), nullable=False)
+    start_date = db.Column(db.DateTime, nullable=False)
+    end_date = db.Column(db.DateTime, nullable=False)
+    admin_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    image_url = db.Column(db.String(255))
+    max_discount = db.Column(db.Numeric(10, 2))  # For percentage discounts
+    usage_limit = db.Column(db.Integer)  # Max number of uses (optional)
+
+    # Relationships
+    products = db.relationship(
+        "Product", secondary="promotion_product_association", backref="promotions"
+    )
+    admin = db.relationship("User", backref="created_promotions")
+
+    orders = db.relationship(
+        "Order",
+        secondary=promotion_order_association,
+        backref=db.backref("applied_promotions", lazy="dynamic"),
+        lazy="dynamic"
+    )
+
+    @property
+    def is_active(self):
+        now_ = now()
+        return (
+            self.start_date.replace(tzinfo=timezone.utc)
+            <= now_
+            <= self.end_date.replace(tzinfo=timezone.utc)
+        )

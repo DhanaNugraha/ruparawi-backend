@@ -1,5 +1,5 @@
 from instance.database import db
-from models.product import Product, ProductCategory, ProductImage, SustainabilityAttribute, ProductTag, Wishlist
+from models.product import Product, ProductCategory, ProductImage, Promotion, SustainabilityAttribute, ProductTag, Wishlist
 from sqlalchemy.orm import joinedload
 
 
@@ -36,6 +36,35 @@ def process_product_images_repo(primary_image, images_list, product_id):
     )
 
     db.session.add(product_image)
+
+
+def update_product_image_repo(product, primary_image, images_list):
+    if primary_image:
+        product_image = db.session.execute(
+            db.select(ProductImage).filter_by(product_id=product.id, is_primary=True)
+        ).scalar_one_or_none()
+
+        product_image.image_url = primary_image
+
+        db.session.add(product_image)
+
+    if images_list:
+        # delete non-primary images
+        db.session.execute(
+        db.delete(ProductImage).where(
+            ProductImage.product_id == product.id  # noqa: E712
+            & ProductImage.is_primary == False
+            )
+        )
+
+        # add new images
+        for image_url in images_list:
+            product_image = ProductImage(
+                product_id=product.id,
+                image_url=image_url,
+            )
+
+            db.session.add(product_image)
 
 
 def process_tags_repo(tags_list, product): 
@@ -224,3 +253,4 @@ def verify_product_repo(product, requested_quantity):
         return ("Product is inactive", False)
 
     return ("", True)
+
