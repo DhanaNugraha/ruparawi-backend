@@ -24,9 +24,17 @@ from .community import (
     ProductReview, 
     VendorReview
 )
-from .article import Article
+from .article import (
+    Article,
+)
 
+from .testimonial import (
+    VendorTestimonial,
+)
 
+from .product_review import (
+    ProductReview,
+)
 
 __all__ = [
     "User",
@@ -48,5 +56,7 @@ __all__ = [
     "OrderStatusHistory",
     "ProductReview",
     "VendorReview",
-    "Article"
+    "Article",
+    "VendorTestimonial",
+    "ProductReview",
 ]
