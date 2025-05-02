@@ -8,6 +8,8 @@ class OrderStatus(Enum):
     SHIPPED = "shipped"
     DELIVERED = "delivered"
     CANCELLED = "cancelled"
+    RETURNED = "returned"
+    COMPLETED = "completed"
 
 
 class PaymentStatus(Enum):

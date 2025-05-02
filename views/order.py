@@ -1,8 +1,8 @@
 import uuid
-from flask import jsonify
+from flask import json, jsonify
 from pydantic import ValidationError
 from instance.database import db
-from repo.order import add_item_to_shopping_cart_repo, add_order_status_history_repo, checkout_order_repo, clear_shopping_cart_item_repo, delete_shopping_cart_item_repo, get_cart_items_repo, get_cart_with_items_and_product_repo, get_order_repo, get_shopping_cart_repo, process_order_items, update_order_status_repo, update_shopping_cart_item_repo
+from repo.order import add_item_to_shopping_cart_repo, add_order_status_history_repo, apply_promotion_to_order_repo, checkout_order_repo, clear_shopping_cart_item_repo, delete_shopping_cart_item_repo, get_cart_items_repo, get_cart_with_items_and_product_repo, get_order_repo, get_promotions_repo, get_shopping_cart_repo, process_order_items, update_order_status_repo, update_shopping_cart_item_repo, validate_promotion_repo
 from repo.product import get_product_detail_repo, verify_product_repo
 from schemas.order import AddCartItemResponse, CartItemResponse, CartResponse, CartItemUpdate, CartItemCreate, OrderCreate, OrderResponse, OrderStatusUpdate
 from shared.time import now
@@ -185,6 +185,9 @@ def checkout_order_view(user, order_request):
         # get cart with items and product
         cart = get_cart_with_items_and_product_repo(user.id)
 
+        # save cart items for promotions later
+        cart_items = cart.items
+
         # Generate unique order number
         order_number = generate_order_number()
 
@@ -192,7 +195,7 @@ def checkout_order_view(user, order_request):
         order = checkout_order_repo(cart, order_data_validated, user.id, order_number)
 
         # convert cart items to order items
-        for item in cart.items:
+        for item in cart_items:
             product = item.product
 
             # Recheck product stock and status
@@ -213,6 +216,38 @@ def checkout_order_view(user, order_request):
             # delete cart item
             clear_shopping_cart_item_repo(item)
 
+        promotion_response = {}
+
+        # validate promotion
+        if order_data_validated.promotion_code:
+            print("1")
+            promotion = validate_promotion_repo(
+                order_data_validated.promotion_code, cart_items
+            )
+
+            print("2")
+            if promotion.get("error"):  
+                return jsonify(
+                    {
+                        "message": promotion.get("error"),
+                        "success": False,
+                        "location": "view checkout order repo",
+                    }
+                ), 400
+            
+            print("3")
+
+            order, discount = apply_promotion_to_order_repo(order, promotion.get("promotion"), promotion.get("eligible_item_ids"))
+
+            print("4")
+            promotion_response = {
+                "title": promotion.get("promotion").title,
+                "discount": round(discount, 2), 
+                "eligible_items_ids": promotion.get("eligible_item_ids"),
+            }
+
+            print("5")
+
         # add order status history
         add_order_status_history_repo(order, user.id)
 
@@ -223,6 +258,7 @@ def checkout_order_view(user, order_request):
             {
                 "message": "Order checked out successfully",
                 "order": OrderResponse.model_validate(order).model_dump(),
+                "applied_promotion": promotion_response,
                 "success": True,
             }
         ), 201
@@ -260,12 +296,18 @@ def generate_order_number():
 def get_order_view(user, order_number):
     try:
         order = get_order_repo(user, order_number)
+        promotions = get_promotions_repo(order.id)
 
         return jsonify(
             {
                 "message": "Order fetched successfully",
                 "order": OrderResponse.model_validate(order).model_dump(),
                 "success": True,
+                "applied_promotions": [{
+                        "title": promotion.title,
+                        "discount": round(promotion.discount_applied, 2),
+                        "eligible_items": json.loads(promotion.eligible_items)
+                    } for promotion in promotions]
             }
         ), 200
 
