@@ -235,7 +235,7 @@ class ProductUpdateRequest(BaseModel):
     min_order_quantity: Optional[int] = None
     is_active: Optional[bool] = None
     primary_image_url: Optional[str] = None
-    images: Optional[List[str]] = []
+    images: Optional[List[str]] = None
 
     @field_validator("name")
     def validate_name(cls, value):
@@ -412,6 +412,60 @@ class WishlistProductResponse(BaseModel):
 class WishlistResponse(BaseModel):
     products: List[WishlistProductResponse]
     count: Optional[int]
+
+    model_config = ConfigDict(
+        from_attributes=True,  # Can read SQLAlchemy model
+        extra="ignore",  # ignore extra fields
+    )
+
+
+# -------------------------------------------------- Promotion --------------------------------------------------
+
+
+class PromotionListResponse(BaseModel):
+    id: int
+    is_active: bool
+    promotion_type: str
+    title: str
+    start_date: datetime
+    end_date: datetime
+    promo_code: str
+    image_url: Optional[str]
+    usage_limit: int
+    products: List[object] | str = []
+
+    @field_validator("products")
+    def validate_product_ids(cls, value):
+        # repr to convert class object to string
+        return repr([product.id for product in value])
+
+    model_config = ConfigDict(
+        from_attributes=True,  # Can read SQLAlchemy model
+        extra="ignore",  # ignore extra fields
+    )
+
+
+class PromotionDetailResponse(BaseModel):
+    id: int
+    title: str
+    description: Optional[str] = None
+    promo_code: str
+    discount_value: float
+    promotion_type: str
+    start_date: datetime
+    end_date: datetime
+    image_url: Optional[str] = None
+    max_discount: Optional[float] = None  # Required for percentage discounts
+    usage_limit: Optional[int]
+    products: List[object] | str = []
+    created_at: datetime
+    updated_at: datetime
+    is_active: bool
+
+    @field_validator("products")
+    def validate_product_ids(cls, value):
+        # repr to convert class object to string
+        return repr([product.id for product in value])
 
     model_config = ConfigDict(
         from_attributes=True,  # Can read SQLAlchemy model

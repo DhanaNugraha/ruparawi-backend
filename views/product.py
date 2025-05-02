@@ -1,7 +1,7 @@
 from flask import jsonify
 from pydantic import ValidationError
 from instance.database import db
-from models.product import ProductImage
+from repo.admin import get_promotion_by_id_repo, list_active_promotions_repo
 from repo.product import (
     add_product_to_wishlist_by_user_id_repo,
     create_product_repo,
@@ -17,6 +17,7 @@ from repo.product import (
     remove_product_from_wishlist_repo,
     soft_delete_product_repo,
     update_product_repo,
+    update_product_image_repo,
 )
 from schemas.admin import CategoryResponse, CategoryTreeResponse
 from schemas.product import (
@@ -27,6 +28,8 @@ from schemas.product import (
     ProductListFilters,
     ProductListResponse,
     ProductUpdateRequest,
+    PromotionDetailResponse,
+    PromotionListResponse,
     WishlistProductResponse,
     WishlistResponse,
 )
@@ -197,6 +200,12 @@ def update_product_view(user, update_request, product_id):
             process_sustainability_repo(
                 update_data_validated.sustainability_attributes, product
             )
+
+        if update_data_validated.images or update_data_validated.primary_image_url:
+            update_product_image_repo(
+                product, update_data_validated.primary_image_url, update_data_validated.images
+            )
+
 
         db.session.commit()
 
@@ -461,3 +470,60 @@ def get_category_detail_view(category_id):
             "success": False,
             "location": "view get category detail repo",
         }, 500
+
+
+
+# ------------------------------------------------------ Get promotions --------------------------------------------------
+
+
+def get_promotions_view():
+    try:
+        promotions = list_active_promotions_repo()
+
+        promotions_response = [
+            PromotionListResponse.model_validate(promotion).model_dump() for promotion in promotions
+        ]
+
+        return jsonify(
+            {
+                "success": True,
+                "message": "Promotions fetched successfully",
+                "promotions": promotions_response,
+            }
+        ), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify(
+            {
+                "message": str(e),
+                "success": False,
+                "location": "view get all promotions repo",
+            }
+        ), 500
+
+
+# ------------------------------------------------------ Get promotion detail --------------------------------------------------
+
+
+def get_promotion_detail_view(promotion_id):
+    try:
+        promotion = get_promotion_by_id_repo(promotion_id)
+
+        return jsonify(
+            {
+                "success": True,
+                "message": "Promotion fetched successfully",
+                "promotion": PromotionDetailResponse.model_validate(promotion).model_dump(),
+            }
+        ), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify(
+            {
+                "message": str(e),
+                "success": False,
+                "location": "view get promotion detail repo",
+            }
+        ), 500

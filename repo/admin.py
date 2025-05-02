@@ -1,5 +1,6 @@
+from datetime import timezone
 from instance.database import db
-from models.product import ProductCategory
+from models.product import Product, ProductCategory, Promotion
 from models.user import AdminLog, User
 from models.article import Article
 from repo.product import get_category_by_id_repo
@@ -28,6 +29,13 @@ def log_admin_action_repo(user, request):
 
     db.session.add(log)
     db.session.commit()
+
+
+def get_admin_logs_repo():
+    return db.paginate(db.select(AdminLog))
+
+
+# ------------------ CATEGORY -----------------
 
 
 def check_parent_category_repo(category_id):
@@ -78,17 +86,16 @@ def soft_delete_category_repo(category_id):
     return category
 
 
+# ------------------ ARTICLE ------------------
+
+
 def create_article_repo(title, content, author_id):
-    article = Article(
-        title=title,
-        content=content,
-        author_id=author_id
-    )
+    article = Article(title=title, content=content, author_id=author_id)
     db.session.add(article)
     db.session.commit()
     return article
 
-  
+
 def get_article_by_id_repo(article_id):
     try:
         article = Article.query.get(article_id)
@@ -98,7 +105,70 @@ def get_article_by_id_repo(article_id):
     except Exception as e:
         raise Exception(f"Error while fetching article by ID: {str(e)}")
 
-        
-def get_admin_logs_repo():
-    return db.paginate(db.select(AdminLog))
 
+# ------------------ Promotions ------------------
+
+
+def create_promotion_repo(admin_id, promotion_data):
+    promotion = Promotion(
+        title=promotion_data.title,
+        description=promotion_data.description,
+        promo_code=promotion_data.promo_code,
+        discount_value=promotion_data.discount_value,
+        promotion_type=promotion_data.promotion_type,
+        start_date=promotion_data.start_date,
+        end_date=promotion_data.end_date,
+        admin_id=admin_id,
+        image_url=promotion_data.image_url,
+        max_discount=promotion_data.max_discount,
+        usage_limit=promotion_data.usage_limit,
+    )
+
+    db.session.add(promotion)
+    db.session.flush()
+    return promotion
+
+
+def update_promotion_repo(promotion_id, update_data):
+    promotion = db.one_or_404(db.select(Promotion).filter_by(id=promotion_id))
+
+    for key, value in update_data.model_dump().items():
+        if value is not None:
+            setattr(promotion, key, value)
+
+    db.session.flush()
+    return promotion
+
+
+def add_products_to_promotion_repo(promotion, product_ids_list):
+    for product_id in product_ids_list:
+        product = db.one_or_404(db.select(Product).filter_by(id=product_id), description=f"Product does not exist '{product_id}'.")
+
+        promotion.products.append(product)
+
+
+def get_promotion_detail_repo(promotion_id):
+    return db.one_or_404(db.select(Promotion).filter_by(id=promotion_id))
+
+
+def list_active_promotions_repo():
+    now_ = now()
+    return (
+        db.session.execute(
+            db.select(Promotion)
+            .filter(
+                Promotion.start_date <= now_, Promotion.end_date >= now_
+            )
+            .order_by(Promotion.end_date)
+        )
+        .scalars()
+        .all()
+    )
+
+
+def list_all_promotions_repo():
+    return db.session.execute(db.select(Promotion).order_by(Promotion.end_date)).scalars().all()
+
+
+def get_promotion_by_id_repo(promotion_id):
+    return db.one_or_404(db.select(Promotion).filter_by(id=promotion_id))

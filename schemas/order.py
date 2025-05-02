@@ -81,6 +81,7 @@ class OrderCreate(BaseModel):
     shipping_address_id: int
     billing_address_id: Optional[int] = None
     payment_method_id: int
+    promotion_code: Optional[str] = None
     notes: Optional[str] = None
 
     @field_validator("shipping_address_id")
