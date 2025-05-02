@@ -1,16 +1,18 @@
 from instance.database import db
 from .base import BaseModel
-from shared import time
 
 class ProductReview(db.Model, BaseModel):
     __tablename__ = 'product_reviews'
 
     id = db.Column(db.Integer, primary_key=True)
-    product_id = db.Column(db.Integer, nullable=False)
-    user_id = db.Column(db.Integer, nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     rating = db.Column(db.Integer, nullable=False)  # 1–5
     comment = db.Column(db.Text, nullable=True)
-    created_at = db.Column(db.DateTime, default=time.now)
+    
+     # Relationships
+    product = db.relationship('Products', backref=db.backref('reviews', lazy=True))
+    user = db.relationship('Users', backref=db.backref('reviews', lazy=True))
 
     def __repr__(self):
         return f"<Review {self.id} for Product {self.product_id}>"
