@@ -4,7 +4,6 @@ from .base import BaseModel
 class ProductReview(db.Model, BaseModel):
     __tablename__ = 'product_reviews'
 
-    id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     rating = db.Column(db.Integer, nullable=False)  # 1–5
