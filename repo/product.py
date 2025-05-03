@@ -1,23 +1,17 @@
 from instance.database import db
-from models.product import (
-    Product,
-    ProductCategory,
-    ProductImage,
-    SustainabilityAttribute,
-    ProductTag,
-    Wishlist,
-)
+from models.product import Product, ProductCategory, ProductImage, Promotion, SustainabilityAttribute, ProductTag, Wishlist
+from sqlalchemy.orm import joinedload
 
 
 def create_product_repo(product_data, user_id):
     product = Product(
-        name=product_data.name,
+        name = product_data.name,
         description=product_data.description,
         price=float(product_data.price),  # Convert Decimal for SQLAlchemy
         category_id=product_data.category_id,
         vendor_id=user_id,
         stock_quantity=product_data.stock_quantity,
-        min_order_quantity=product_data.min_order_quantity,
+        min_order_quantity=product_data.min_order_quantity
     )
 
     db.session.add(product)
@@ -25,7 +19,6 @@ def create_product_repo(product_data, user_id):
     db.session.flush()
 
     return product
-
 
 def process_product_images_repo(primary_image, images_list, product_id):
     for image_url in images_list:
@@ -37,7 +30,9 @@ def process_product_images_repo(primary_image, images_list, product_id):
         db.session.add(product_image)
 
     product_image = ProductImage(
-        product_id=product_id, image_url=primary_image, is_primary=True
+        product_id=product_id,
+        image_url=primary_image,
+        is_primary=True
     )
 
     db.session.add(product_image)
@@ -56,11 +51,9 @@ def update_product_image_repo(product, primary_image, images_list):
     if images_list:
         # delete non-primary images
         db.session.execute(
-            db.delete(ProductImage).where(
-                ProductImage.product_id
-                == product.id  # noqa: E712
-                & ProductImage.is_primary
-                == False
+        db.delete(ProductImage).where(
+            ProductImage.product_id == product.id  # noqa: E712
+            & ProductImage.is_primary == False
             )
         )
 
@@ -74,7 +67,7 @@ def update_product_image_repo(product, primary_image, images_list):
             db.session.add(product_image)
 
 
-def process_tags_repo(tags_list, product):
+def process_tags_repo(tags_list, product): 
     for tag_name in tags_list:
         tag = db.session.execute(
             db.select(ProductTag).filter_by(name=tag_name)
@@ -94,7 +87,7 @@ def process_sustainability_repo(sustainability_attributes, product):
         attribute = db.session.execute(
             db.select(SustainabilityAttribute).filter_by(name=sustainability_attribute)
         ).scalar_one_or_none()
-
+        
         if not attribute:
             attribute = SustainabilityAttribute(name=sustainability_attribute)
             db.session.add(attribute)
@@ -107,16 +100,14 @@ def process_sustainability_repo(sustainability_attributes, product):
 def get_products_list_repo(product_filter, request_args):
     # base query
     products = db.select(Product).filter_by(is_active=True)
-
+    
     # extra filters if any
     if product_filter.category_id:
         products = products.filter_by(category_id=product_filter.category_id)
 
     if product_filter.tags:
         # assuming that it joins with the help of association
-        products = products.join(Product.tags, isouter=True).filter(
-            ProductTag.name.in_(product_filter.tags)
-        )
+        products = products.join(Product.tags, isouter=True).filter(ProductTag.name.in_(product_filter.tags))
 
     if product_filter.min_price:
         products = products.filter(Product.price >= product_filter.min_price)
@@ -144,7 +135,7 @@ def update_product_repo(user_id, product_id, update_data):
     # Verify product exists and belongs to current vendor
     product = db.one_or_404(
         db.select(Product).filter_by(id=product_id, vendor_id=user_id),
-        description=f"No product with id '{product_id}' and vendor id '{user_id}'.",
+        description=f"No product with id '{product_id}' and vendor id '{user_id}'.",    
     )
 
     # Apply updates
@@ -195,20 +186,20 @@ def add_product_to_wishlist_by_user_id_repo(user_id, product):
         db.session.commit()
 
         return wishlist
-
+    
     else:
         return None
-
+    
 
 def remove_product_from_wishlist_repo(wishlist, product):
     if wishlist.remove_product(product):
         db.session.commit()
 
         return wishlist
-
+    
     else:
         return None
-
+    
 
 def get_wishlist_by_user_id_repo(user_id):
     return db.one_or_404(
@@ -219,10 +210,10 @@ def get_wishlist_by_user_id_repo(user_id):
 
 def get_product_primary_image_repo(product_id):
     return db.session.execute(
-        db.select(ProductImage.image_url).filter_by(
-            product_id=product_id, is_primary=True
-        )
+        db.select(ProductImage.image_url)
+        .filter_by(product_id=product_id, is_primary=True)
     ).scalar_one_or_none()
+
 
 
 # ----------------------------------------------------------- Categories -----------------------------------------------------------
