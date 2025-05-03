@@ -45,7 +45,6 @@ def users_data_inject(test_app):
             "password_hash": "testing/password",
             "created_at": datetime_from_string(str(now())),
             "updated_at": datetime_from_string(str(now())),
-            "role": UserRole.BUYER.value,
         },
         {
             "id": 2,
@@ -54,7 +53,6 @@ def users_data_inject(test_app):
             "password_hash": "testing/password",
             "created_at": datetime_from_string(str(now())),
             "updated_at": datetime_from_string(str(now())),
-            "role": UserRole.BUYER.value,
         },
     ]
     with test_app.app_context():
@@ -67,6 +65,34 @@ def users_data_inject(test_app):
         _db.session.commit()
 
         return users_list
+    
+
+@pytest.fixture
+def roles_data_inject(test_app):
+    roles_data = [
+        {
+            "id": 1,
+            "name": "buyer",
+        },
+        {
+            "id": 2,
+            "name": "vendor",
+        },
+        {
+            "id": 3,
+            "name": "admin",
+        },
+    ]
+    with test_app.app_context():
+        roles_list = []
+        for roles in roles_data:
+            roles_model = models.UserRole(**roles)
+            roles_list.append(roles_model)
+
+        _db.session.add_all(roles_list)
+        _db.session.commit()
+
+        return roles_list
 
 
 @pytest.fixture
@@ -264,6 +290,57 @@ def cart_item_data_inject(test_app):
     
 
 @pytest.fixture
+def address_data_inject(test_app):
+    address_data = [
+        {
+            "id": 1,
+            "user_id": 1,
+            "address_line1": "123 Main St",
+            "address_line2": "123 Main St",
+            "city": "New York",
+            "state": "NY",
+            "postal_code": "10001",
+            "country": "USA",
+            "is_default": True,
+        }
+    ]
+    with test_app.app_context():
+        address_list = []
+        for address in address_data:
+            address_model = models.UserAddress(**address)
+            address_list.append(address_model)
+
+        _db.session.add_all(address_list)
+        _db.session.commit()
+
+        return address_list
+    
+
+@pytest.fixture
+def payment_method_data_inject(test_app):
+    payment_method_data = [
+        {
+            "id": 1,
+            "user_id": 1,
+            "payment_type": "credit_card",
+            "provider": "Visa",
+            "account_number": "4111111111111111",
+            "is_default": True,
+        }
+    ]
+    with test_app.app_context():
+        payment_method_list = []
+        for payment_method in payment_method_data:
+            payment_method_model = models.UserPaymentMethod(**payment_method)
+            payment_method_list.append(payment_method_model)
+
+        _db.session.add_all(payment_method_list)
+        _db.session.commit()
+
+        return payment_method_list
+    
+
+@pytest.fixture
 def mock_user_data():
     return {
         "username": "eco_buyer",
@@ -282,6 +359,12 @@ def mock_login_data():
 def mock_token_data():
     return {
         "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0NDgxMjcxNSwianRpIjoiYTg1NDlkZjctYjJlNS00MWVkLWJlNzktMWY0NmNjMzZiNDk4IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3NDQ4MTI3MTUsImNzcmYiOiJiOWNkN2E4NC04YjUyLTQ5ZWEtYjY2ZC1jNTU3ZDQ1MzUzYzEiLCJ1c2VybmFtZSI6ImVjb19idXllciIsImVtYWlsIjoiYnV5ZXJAZXhhbXBsZS5jb20iLCJpc192ZW5kb3IiOmZhbHNlLCJpc19hZG1pbiI6ZmFsc2V9.4c1EcKMgb__oQLqBjptFxjl9_up9hbPXzNuguQZRGQQ"
+    }
+
+@pytest.fixture
+def mock_refresh_token_data():
+    return {
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0NjI2NDA1NCwianRpIjoiZDAwZjVjZDgtNmEyMy00ZGFlLWI2ZTYtYjViYjczNmQwN2I1IiwidHlwZSI6InJlZnJlc2giLCJzdWIiOiIxIiwibmJmIjoxNzQ2MjY0MDU0LCJjc3JmIjoiMDMzM2ZiMzgtOTkxNy00MWQzLTg3YzEtYTIzYjAxNjhiN2UxIiwiZXhwIjoxNzQ4ODU2MDU0LCJ1c2VybmFtZSI6ImVjb19idXllciIsImVtYWlsIjoiYnV5ZXJAZXhhbXBsZS5jb20ifQ.DRtVTPOH9Vw2H1RCTZJb7zPMJT3O5JJ_xjr2UOEKPD0"
     }
 
 @pytest.fixture
@@ -406,3 +489,47 @@ def mock_add_cart_item():
 @pytest.fixture
 def mock_update_cart_item():
     return {"product_id": 1, "quantity": 5}
+
+@pytest.fixture
+def mock_create_address_data():
+    return {
+        "address_line1": "123 Main St",
+        "address_line2": "123 Main St",
+        "city": "New York",
+        "state": "NY",
+        "postal_code": "10001",
+        "country": "USA",
+        "is_default": True,
+    }
+
+@pytest.fixture
+def mock_update_address_data():
+    return {
+        "address_line1": "123 Main St",
+        "address_line2": "123 Main St",
+        "city": "New York",
+        "state": "NY",
+        "postal_code": "10001",
+        "country": "USA",
+        "is_default": True,
+    }
+
+@pytest.fixture
+def mock_create_payment_method_data():
+    return {
+        "payment_type": "credit_card",
+        "provider": "Visa",
+        "account_number": "4111111111111111",
+        "expiry_date": "2025-12-31",
+        "is_default": True,
+    }
+
+@pytest.fixture
+def mock_update_payment_method_data():
+    return {
+        "payment_type": "credit_card",
+        "provider": "Visa",
+        "account_number": "4111111111111111",
+        "expiry_date": "2040-12-31",
+        "is_default": True,
+    }

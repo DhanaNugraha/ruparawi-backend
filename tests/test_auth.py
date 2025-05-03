@@ -1,12 +1,11 @@
 import models
-from models.user import UserRole
 
-# uv run pytest -v -s --cov=.
-# uv run pytest tests/test_auth.py -v -s --cov=.
+# uv run pytest -v -s --cov=. --cov-report term-missing
+# uv run pytest tests/test_auth.py -v -s --cov=. --cov-report term-missing
 
 
 # ---------------------------------------------------------------------------- Register User Tests ----------------------------------------------------------------------------
-def test_register_user(client, db, mock_user_data, users_data_inject):
+def test_register_user(client, db, mock_user_data, users_data_inject, roles_data_inject):
     register_user = client.post("/auth/register", json=mock_user_data)
 
     assert register_user.status_code == 201
@@ -19,7 +18,7 @@ def test_register_user(client, db, mock_user_data, users_data_inject):
     assert user.id == 3
     assert user.username == mock_user_data["username"]
     assert user.email == mock_user_data["email"]
-    assert user.role == UserRole.BUYER.value
+    assert repr([role.name for role in user.role][0]) == "'buyer'"
 
 
 def test_register_user_username_validation_error(client, mock_user_data):
@@ -104,7 +103,7 @@ def test_register_user_duplicates(client, mock_user_data, users_data_inject):
 # ---------------------------------------------------------------------------- Login User Tests ----------------------------------------------------------------------------
 
 
-def test_login_user(client, db, mock_user_data, mock_login_data):
+def test_login_user(client, db, mock_user_data, mock_login_data, roles_data_inject):
     # register mock user
     register_user = client.post("/auth/register", json=mock_user_data)
 
@@ -163,7 +162,7 @@ def test_login_user_email_validation_error(client, mock_login_data, users_data_i
     assert login_user.json["location"] == "view login user request validation"
 
 
-def test_login_user_invalid_credential(client, mock_user_data, mock_login_data):
+def test_login_user_invalid_credential(client, mock_user_data, mock_login_data, roles_data_inject):
     # register mock user
     register_user = client.post("/auth/register", json=mock_user_data)
 
@@ -191,7 +190,7 @@ def test_login_user_invalid_credential(client, mock_user_data, mock_login_data):
 # ---------------------------------------------------------------------------- Get Current User Tests ----------------------------------------------------------------------------
 
 
-def test_get_current_user(client, mock_user_data, mock_token_data):
+def test_get_current_user(client, mock_user_data, mock_token_data, roles_data_inject):
     # register mock user
     register_user = client.post("/auth/register", json=mock_user_data)
 
@@ -212,3 +211,26 @@ def test_get_current_user_missing_user(client, mock_token_data):
     get_current_user = client.get("/auth/me", headers=mock_token_data)
 
     assert get_current_user.status_code == 404
+
+
+#  ---------------------------------------------------------------------------- refresh token Tests ----------------------------------------------------------------------------
+
+def test_refresh_token(client, mock_user_data, mock_token_data, mock_refresh_token_data, roles_data_inject):
+    # register mock user
+    register_user = client.post("/auth/register", json=mock_user_data)
+
+    assert register_user.status_code == 201
+
+    # login user
+    login_user = client.post("/auth/login", json=mock_user_data)
+
+    assert login_user.status_code == 200
+
+    # refresh token
+    refresh_token = client.post("/auth/refresh", headers=mock_refresh_token_data)
+
+    assert refresh_token.status_code == 200
+    assert len(refresh_token.json) == 1
+
+
+# all 100%

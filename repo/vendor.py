@@ -1,5 +1,10 @@
+from datetime import timedelta
+from sqlalchemy import distinct, extract, func
 from instance.database import db
+from models.order import Order, OrderItem
 from models.user import UserRole, VendorProfile, VendorStatus
+from shared.time import now
+from sqlalchemy.orm import joinedload
 
 
 def vendor_register_repo(user, vendor_data_validated):
@@ -65,8 +70,99 @@ def update_vendor_profile_repo(vendor_profile, vendor_data_validated):
     for field, value in vendor_data_validated.model_dump().items():
         # only update the field if it is not None
         if value is not None:
+            print(field, value)
             setattr(vendor_profile, field, value)
+
+
+    print(vendor_profile.business_name)
 
     db.session.commit()
 
     return vendor_profile
+
+
+# ----------------------------------------------------------- Stats -----------------------------------------------------------
+
+
+def get_vendor_stats_repo(user_id_):
+    now_ = now()
+    current_year = now_.year
+
+    all_time_stats = (
+        db.session.query(
+            func.sum(OrderItem.total_price).label("total_revenue"),
+            func.sum(OrderItem.quantity).label("total_sales"),
+            func.count(OrderItem.id).label("total_orders"),
+            func.count(distinct(Order.user_id)).label("total_customers"),
+        )
+        .join(Order, OrderItem.order_id == Order.id)
+        .filter(OrderItem.vendor_id == user_id_)
+        .first()
+    )
+
+    monthly_revenue = db.session.query(
+        extract('month', Order.created_at).label('month'),
+        func.sum(OrderItem.total_price).label('total_revenue'),
+    ).join(
+        OrderItem, Order.id == OrderItem.order_id
+    ).filter(
+        OrderItem.vendor_id == user_id_,
+        extract('year', Order.created_at) == current_year,
+    ).group_by(
+        extract('month', Order.created_at)
+    ).order_by(
+        extract('month', Order.created_at)
+    ).all()
+
+    monthly_orders = db.session.query(
+        extract('month', Order.created_at).label('month'),
+        func.count(Order.id).label('total_orders'),
+    ).join(
+        OrderItem, Order.id == OrderItem.order_id
+    ).filter(
+        OrderItem.vendor_id == user_id_,
+        extract('year', Order.created_at) == current_year,
+    ).group_by(
+        extract('month', Order.created_at)
+    ).order_by(
+        extract('month', Order.created_at)
+    ).all()
+
+    return {
+        "total_revenue": all_time_stats.total_revenue,
+        "total_sales": all_time_stats.total_sales,
+        "total_orders": all_time_stats.total_orders,
+        "total_customers": all_time_stats.total_customers,
+        "monthly_revenue": [
+            {
+                "month": int(sale.month),
+                "total_revenue": round(float(sale.total_revenue), 2)
+                if sale.total_revenue
+                else 0.0,
+            }
+            for sale in monthly_revenue
+        ],
+        "monthly_orders": [
+            {
+                "month": int(sale.month),
+                "total_orders": int(sale.total_orders)
+                if sale.total_orders
+                else 0,
+            }
+            for sale in monthly_orders
+        ],
+    }
+
+
+# ----------------------------------------------------------------------------------------------------------------------------- vendor recent orders -----------------------------------------------------------------------------------------------------------------------------
+
+
+def get_vendor_recent_orders_repo(user):
+    return (
+        db.session.query(Order, OrderItem)
+        .join(OrderItem, Order.id == OrderItem.order_id)
+        .filter(OrderItem.vendor_id == user.id)
+        .order_by(Order.created_at.desc())
+        .limit(5)
+        .all()
+    )

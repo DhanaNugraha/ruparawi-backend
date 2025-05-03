@@ -124,12 +124,12 @@ class OrderResponse(BaseModel):
     status: str
     total_amount: float
     created_at: Optional[datetime] = None
-    items:  list
-    status_history: list
+    items:  list | str
+    status_history: list | str
 
     @field_validator("items")
     def validate_items(cls, value):
-        return repr([item.product_id for item in value])
+        return repr([item.product.name for item in value])
     
     @field_validator("status_history")
     def validate_status_history(cls, value):
