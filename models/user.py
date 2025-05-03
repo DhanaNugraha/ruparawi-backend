@@ -42,7 +42,6 @@ class User(db.Model, BaseModel):
     payment_methods = db.relationship("UserPaymentMethod", backref="user", lazy=True)
     products = db.relationship("Product", backref="vendor", lazy=True)
     orders = db.relationship("Order", backref="customer", lazy=True)
-    reviews_written = db.relationship("ProductReview", backref="reviewer", lazy=True)
     cart = db.relationship("ShoppingCart", backref="user",  uselist=False, lazy="joined" )  # uselist false for one to one. lazy joined to get cart with user.cart
     vendor_profile = db.relationship(
         "VendorProfile", backref="user", uselist=False, lazy="joined"

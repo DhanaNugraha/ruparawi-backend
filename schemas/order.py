@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import Optional
 from pydantic import BaseModel, ConfigDict, field_validator
 
 from models.order import OrderStatus
