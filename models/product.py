@@ -105,7 +105,6 @@ class Product(db.Model, BaseModel):
         "SustainabilityAttribute", secondary=product_sustainability_association, backref="product", lazy=True
     )
     tags = db.relationship("ProductTag", secondary=product_tag_association, backref="product", lazy=True)
-    reviews = db.relationship("ProductReview", backref="product", lazy=True)
     cart_items = db.relationship("CartItem", backref="product", lazy=True)
     order_items = db.relationship("OrderItem", backref="product", lazy=True)
 

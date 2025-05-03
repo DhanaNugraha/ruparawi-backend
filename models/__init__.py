@@ -20,9 +20,6 @@ from .order import (
     OrderItem, 
     OrderStatusHistory
     )
-from .community import (
-    VendorReview
-)
 from .article import (
     Article,
 )
@@ -41,6 +38,7 @@ __all__ = [
     "UserPaymentMethod",
     "AdminUser",
     "AdminLog",
+    "VendorProfile",
     "ProductCategory",
     "SustainabilityAttribute",
     "Product",
@@ -54,7 +52,6 @@ __all__ = [
     "OrderItem",
     "OrderStatusHistory",
     "ProductReview",
-    "VendorReview",
     "Article",
     "VendorTestimonial",
 ]

@@ -481,11 +481,17 @@ def get_promotions_view():
         promotions = list_active_promotions_repo()
 
         promotions_response = [
-            PromotionListResponse.model_validate(promotion).model_dump() for promotion in promotions
+            PromotionListResponse.model_validate(promotion).model_dump() for promotion in promotions.items
         ]
 
         return jsonify(
             {
+                "pagination": {
+                    "total": promotions.total,
+                    "pages": promotions.pages,
+                    "current_page": promotions.page,
+                    "per_page": promotions.per_page,
+                },
                 "success": True,
                 "message": "Promotions fetched successfully",
                 "promotions": promotions_response,
