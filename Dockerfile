@@ -16,5 +16,8 @@ RUN uv sync
 # Add this line with your app's port
 EXPOSE 3005  
 
+# Run tests first
+RUN uv run pytest -v -s --cov=.
 
+# Run the app
 CMD ["uv", "run", "flask", "--app", "app", "run", "--host", "0.0.0.0", "--port", "8000"]

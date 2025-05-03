@@ -2,7 +2,7 @@ from flask import jsonify
 from pydantic import ValidationError
 from instance.database import db
 from repo.product import get_vendor_products_repo
-from repo.vendor import update_vendor_profile_repo, vendor_register_repo
+from repo.vendor import get_vendor_recent_orders_repo, get_vendor_stats_repo, update_vendor_profile_repo, vendor_register_repo
 from schemas.product import VendorProductsResponse
 from schemas.vendor import (
     VendorCreateRequest,
@@ -79,7 +79,9 @@ def update_vendor_profile_view(user, vendor_request):
     try:
         vendor_data_validated = VendorUpdateRequest.model_validate(vendor_request)
 
-        update_vendor_profile_repo(user, vendor_data_validated)
+        vendor_profile = user.vendor_profile
+
+        update_vendor_profile_repo(vendor_profile, vendor_data_validated)
 
         return jsonify(
             {
@@ -146,3 +148,60 @@ def get_vendor_products_view(user):
         ), 500
 
 
+# -------------------------------------------------------------- Get vendor stats ---------------------------------------------------------------------------
+
+
+def get_vendor_stats_view(user):
+    try:
+        stats = get_vendor_stats_repo(user.id)
+
+        return jsonify(
+            {
+                "success": True,
+                "vendor_stats": stats,
+            }
+        ), 200
+
+    except Exception as e:
+        return jsonify(
+            {
+                "message": str(e),
+                "success": False,
+                "location": "view get vendor stats repo",
+            }
+        ), 500
+    
+
+# -------------------------------------------------------------- Get vendor recent orders ---------------------------------------------------------------------------
+
+
+def get_vendor_recent_orders_view(user):
+    try:
+        recent_orders = get_vendor_recent_orders_repo(user)
+
+        return jsonify(
+            {
+                "success": True,
+                "recent_orders": [
+                    {
+                        "order_id": order[0].id,
+                        "product": order[1].product.name,
+                        "customer": order[0].customer.username,
+                        "qty": order[1].quantity,
+                        "total": order[1].total_price,
+                        "order_date": order[0].created_at,
+                        "order_status": order[0].status,
+                    }
+                    for order in recent_orders
+                ],
+            }
+        ), 200
+
+    except Exception as e:
+        return jsonify(
+            {
+                "message": str(e),
+                "success": False,
+                "location": "view get vendor recent orders repo",
+            }
+        ), 500

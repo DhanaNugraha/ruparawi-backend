@@ -20,6 +20,7 @@ def login():
 def get_current_user():
     return get_user_view(current_user)
 
+
 @auth_router.route("/refresh", methods=["POST"])
 @jwt_required(refresh=True)
 def refresh():

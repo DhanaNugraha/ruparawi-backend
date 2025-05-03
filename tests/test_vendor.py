@@ -1,12 +1,12 @@
 # import models
 
 # uv run pytest -v -s --cov=.
-# uv run pytest tests/test_vendor.py -v -s --cov=.
+# uv run pytest tests/test_vendor.py -v -s --cov=. --cov-report term-missing
 
-# ---------------------------------------------------------------------------- Admin apply test ----------------------------------------------------------------------------
+# ---------------------------------------------------------------------------- Vendor apply test ----------------------------------------------------------------------------
 
 
-def test_vendor_apply(client, mock_user_data, mock_vendor_apply_data, mock_token_data):
+def test_vendor_apply(client, mock_user_data, mock_vendor_apply_data, mock_token_data, roles_data_inject):
     register_user = client.post("/auth/register", json=mock_user_data)
 
     assert register_user.status_code == 201
@@ -24,7 +24,7 @@ def test_vendor_apply(client, mock_user_data, mock_vendor_apply_data, mock_token
 
 
 def test_vendor_apply_duplicate(
-    client, mock_user_data, mock_vendor_apply_data, mock_token_data
+    client, mock_user_data, mock_vendor_apply_data, mock_token_data, roles_data_inject
 ):
     register_user = client.post("/auth/register", json=mock_user_data)
 
@@ -49,7 +49,7 @@ def test_vendor_apply_duplicate(
     
 
 def test_vendor_apply_name_validation_error(
-    client, mock_user_data, mock_vendor_apply_data, mock_token_data
+    client, mock_user_data, mock_vendor_apply_data, mock_token_data, roles_data_inject
 ):
     register_user = client.post("/auth/register", json=mock_user_data)
 
@@ -244,4 +244,4 @@ def test_get_vendor_products(client, mock_user_data, mock_token_data, approved_v
     assert len(get_vendor_products.json["products"]) == 1
 
 
-
+# 
