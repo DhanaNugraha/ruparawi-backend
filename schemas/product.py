@@ -166,11 +166,17 @@ class ProductListResponse(BaseModel):
     tags: List[object] | str
     vendor_id: int
     primary_image_url: str | None = None
+    review_count: int | None
+    average_rating: float | None
 
     @field_validator("tags")
     def validate_tags(cls, value):
         # repr to convert class object to string
         return repr([tag.name for tag in value])
+    
+    @field_validator("average_rating")
+    def validate_average_rating(cls, value):
+        return round(value, 2)
 
     model_config = ConfigDict(
         from_attributes=True,  # Can read SQLAlchemy model
