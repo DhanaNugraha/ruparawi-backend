@@ -109,13 +109,10 @@ def list_products_view(request_args):
             # update rating stats
             product.update_rating_stats()
 
-            # get primary image
-            primary_image = get_product_primary_image_repo(product.id)
-
             # serialize data
             products_response.append(
                 ProductListResponse(
-                    primary_image_url=primary_image,
+                    primary_image_url=[image.image_url for image in product.images if image.is_primary],
                     id=product.id,
                     name=product.name,
                     price=product.price,

@@ -165,7 +165,7 @@ class ProductListResponse(BaseModel):
     category_id: int | None  # no category
     tags: List[object] | str
     vendor_id: int
-    primary_image_url: str | None = None
+    primary_image_url: list | str | None = None
     review_count: int | None
     average_rating: float | None
 
