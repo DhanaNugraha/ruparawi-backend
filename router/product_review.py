@@ -1,9 +1,11 @@
 from flask import Blueprint, request, jsonify
+from flask_jwt_extended import jwt_required
 from repo import product_review as review_repo
 
 product_review_router = Blueprint("product_review", __name__, url_prefix="/review")
 
 @product_review_router.route("/", methods=["POST"])
+@jwt_required()
 def create_product_review():
     data = request.json
     review = review_repo.create_review(
@@ -47,6 +49,7 @@ def get_review_detail(review_id):
     })
 
 @product_review_router.route("/<int:review_id>/edit", methods=["PUT"])
+@jwt_required()
 def edit_review_by_id(review_id):
     data = request.json
     updated = review_repo.update_review(
@@ -65,6 +68,7 @@ def edit_review_by_id(review_id):
     })
 
 @product_review_router.route("/<int:review_id>/delete", methods=["DELETE"])
+@jwt_required()
 def remove_review_by_id(review_id):
     deleted = review_repo.delete_review(review_id)
     if not deleted:

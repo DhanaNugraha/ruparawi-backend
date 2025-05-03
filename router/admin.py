@@ -73,22 +73,23 @@ def create_article():
 
 @admin_router.route("/article", methods=["GET"])
 @jwt_required()
-@admin_required()
 def get_articles():
     return get_articles_view()
 
+@admin_router.route("/article/<int:article_id>", methods=["GET"])
+@jwt_required()
+def get_articles_by_id_view(article_id):
+    return get_article_by_id_view(article_id)
 
-@admin_router.route("/article/<int:article_id>", methods=["GET", "PUT", "DELETE"])
+
+@admin_router.route("/article/<int:article_id>", methods=["PUT", "DELETE"])
 @jwt_required()
 @admin_required()
 def article_detail(article_id):
-    match request.method.lower():
-        case "get":
-            return get_article_by_id_view(article_id)
-        case "put":
-            return update_article_view(request.json, article_id)
-        case "delete":
-            return delete_article_view(article_id)
+    if request.method=="PUT":
+        return update_article_view(request.json, article_id)
+    elif request.method=="DELETE":
+        return delete_article_view(article_id)
 
 
 # ------------------ Promotions ------------------
