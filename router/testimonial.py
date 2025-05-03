@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from repo import testimonial as testimonial_repo
-from view.testimonial import render_testimonial_page
+from views.testimonial import render_testimonial_page
 
 testimonial_router = Blueprint("testimonial", __name__, url_prefix="/testimonial")
 
