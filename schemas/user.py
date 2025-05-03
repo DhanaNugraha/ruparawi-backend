@@ -154,69 +154,13 @@ class UserAddressUpdate(BaseModel):
 
     @field_validator("address_line1")
     def validate_address_line1(cls, value):
-        if value and len(value) < 1 or len(value) > 100:
-            raise ValueError("Address line 1 cannot exceed 100 characters")
-        return value
-
-    @field_validator("address_line2")
-    def validate_address_line2(cls, value):
-        if value and len(value) > 100:
-            raise ValueError("Address line 2 cannot exceed 100 characters")
-        return value
-
-    @field_validator("city")
-    def validate_city(cls, value):
-        if value and len(value) < 1 or len(value) > 50:
-            raise ValueError("City cannot exceed 50 characters")
-        return value
-
-    @field_validator("state")
-    def validate_state(cls, value):
-        if value and len(value) < 1 or len(value) > 50:
-            raise ValueError("State cannot exceed 50 characters")
-        return value
-
-    @field_validator("postal_code")
-    def validate_postal_code(cls, value):
-        if value and len(value) < 1 or len(value) > 20:
-            raise ValueError("Postal code cannot exceed 20 characters")
-        return value
-
-    @field_validator("country")
-    def validate_country(cls, value):
-        if value and len(value) < 1 or len(value) > 50:
-            raise ValueError("Country cannot exceed 50 characters")
-        return value
-
-    model_config = ConfigDict(
-        from_attributes=True,  # Can read SQLAlchemy model
-        extra="ignore",  # ignore extra fields
-    )
-
-
-# -------------------------------------------------- Get all user address --------------------------------------------------
-
-
-class UserAddressResponse(BaseModel):
-    address_line1: str
-    address_line2: Optional[str] = None
-    city: str
-    state: str
-    postal_code: str
-    country: str
-    is_default: bool = False
-    id: int
-    user_id: int
-
-    @field_validator("address_line1")
-    def validate_address_line1(cls, value):
         if len(value) < 1 or len(value) > 100:
             raise ValueError("Address line 1 cannot exceed 100 characters")
         return value
 
     @field_validator("address_line2")
     def validate_address_line2(cls, value):
-        if value and len(value) > 100:
+        if len(value) > 100:
             raise ValueError("Address line 2 cannot exceed 100 characters")
         return value
 
@@ -243,6 +187,26 @@ class UserAddressResponse(BaseModel):
         if len(value) < 1 or len(value) > 50:
             raise ValueError("Country cannot exceed 50 characters")
         return value
+
+    model_config = ConfigDict(
+        from_attributes=True,  # Can read SQLAlchemy model
+        extra="ignore",  # ignore extra fields
+    )
+
+
+# -------------------------------------------------- Get all user address --------------------------------------------------
+
+
+class UserAddressResponse(BaseModel):
+    address_line1: str
+    address_line2: Optional[str] = None
+    city: str
+    state: str
+    postal_code: str
+    country: str
+    is_default: bool = False
+    id: int
+    user_id: int
 
     model_config = ConfigDict(
         from_attributes=True,  # Can read SQLAlchemy model

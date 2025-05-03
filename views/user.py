@@ -74,7 +74,7 @@ def add_address_view(user, address_request):
                 "message": "Address added successfully",
                 "address_id": added_address.id,
             }
-        ), 200
+        ), 201
 
     except ValidationError as e:
         return jsonify(
@@ -199,7 +199,7 @@ def add_payment_method_view(user, payment_method_request):
                     payment_created
                 ).model_dump(),
             }
-        ), 200
+        ), 201
 
     except ValidationError as e:
         return jsonify(

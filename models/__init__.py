@@ -4,7 +4,8 @@ from .user import (
     UserPaymentMethod,
     VendorProfile,
     AdminUser,
-    AdminLog
+    AdminLog,
+    UserRole
     )
 from .product import (
     ProductCategory,
@@ -54,4 +55,5 @@ __all__ = [
     "ProductReview",
     "Article",
     "VendorTestimonial",
+    "UserRole",
 ]

@@ -169,6 +169,16 @@ def update_order_status_repo(order, status_request, user):
     return order
 
 
+def get_all_orders_repo(user):
+    return (
+        db.session.execute(
+            db.select(Order).filter_by(user_id=user.id)
+        )
+        .scalars()
+        .all()
+    )
+
+
 # ----------------------------------------------------------- Promotions -----------------------------------------------------------
 
 

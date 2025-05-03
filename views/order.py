@@ -2,7 +2,7 @@ import uuid
 from flask import json, jsonify
 from pydantic import ValidationError
 from instance.database import db
-from repo.order import add_item_to_shopping_cart_repo, add_order_status_history_repo, apply_promotion_to_order_repo, checkout_order_repo, clear_shopping_cart_item_repo, delete_shopping_cart_item_repo, get_cart_items_repo, get_cart_with_items_and_product_repo, get_order_repo, get_promotions_repo, get_shopping_cart_repo, process_order_items, update_order_status_repo, update_shopping_cart_item_repo, validate_promotion_repo
+from repo.order import add_item_to_shopping_cart_repo, add_order_status_history_repo, apply_promotion_to_order_repo, checkout_order_repo, clear_shopping_cart_item_repo, delete_shopping_cart_item_repo, get_all_orders_repo, get_cart_items_repo, get_cart_with_items_and_product_repo, get_order_repo, get_promotions_repo, get_shopping_cart_repo, process_order_items, update_order_status_repo, update_shopping_cart_item_repo, validate_promotion_repo
 from repo.product import get_product_detail_repo, verify_product_repo
 from schemas.order import AddCartItemResponse, CartItemResponse, CartResponse, CartItemUpdate, CartItemCreate, OrderCreate, OrderResponse, OrderStatusUpdate
 from shared.time import now
@@ -220,12 +220,10 @@ def checkout_order_view(user, order_request):
 
         # validate promotion
         if order_data_validated.promotion_code:
-            print("1")
             promotion = validate_promotion_repo(
                 order_data_validated.promotion_code, cart_items
             )
 
-            print("2")
             if promotion.get("error"):  
                 return jsonify(
                     {
@@ -234,19 +232,14 @@ def checkout_order_view(user, order_request):
                         "location": "view checkout order repo",
                     }
                 ), 400
-            
-            print("3")
 
             order, discount = apply_promotion_to_order_repo(order, promotion.get("promotion"), promotion.get("eligible_item_ids"))
 
-            print("4")
             promotion_response = {
                 "title": promotion.get("promotion").title,
                 "discount": round(discount, 2), 
                 "eligible_items_ids": promotion.get("eligible_item_ids"),
             }
-
-            print("5")
 
         # add order status history
         add_order_status_history_repo(order, user.id)
@@ -320,6 +313,34 @@ def get_order_view(user, order_number):
                 "location": "view get order repo",
             }
         ), 500
+    
+
+# ------------------------------------------------------ Get all order --------------------------------------------------
+
+
+def get_all_orders_view(user):
+    try:
+
+        orders = get_all_orders_repo(user)
+
+        return jsonify(
+            {
+                "success": True,
+                "orders": [
+                    OrderResponse.model_validate(order).model_dump() for order in orders
+                ],
+            }
+        ), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify(
+            {
+                "message": str(e),
+                "success": False,
+                "location": "view get all orders repo",
+            }
+        ), 500
 
 
 # ------------------------------------------------------ Update item in cart --------------------------------------------------
@@ -359,3 +380,5 @@ def update_order_status_view(user, order_status_request, order_number):
                 "location": "view update order status repo",
             }
         ), 500
+    
+

@@ -105,7 +105,6 @@ def update_address_repo(user, address_data, address_id):
         db.select(UserAddress).filter_by(id=address_id, user_id=user.id),
         description=f"No address with id '{address_id}' and user id '{user.id}'.",
     )
-    print(type(address_data))
 
     for field, value in address_data.model_dump().items():
         # only update the field if it is not None
@@ -124,13 +123,6 @@ def get_all_address_repo(user):
         )
         .scalars()
         .all()
-    )
-
-
-def get_address_repo(user, address_id):
-    return db.one_or_404(
-        db.select(UserAddress).filter_by(id=address_id, user_id=user.id),
-        description=f"No address with id '{address_id}' and user id '{user.id}'.",
     )
 
 
