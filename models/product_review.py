@@ -10,8 +10,8 @@ class ProductReview(db.Model, BaseModel):
     comment = db.Column(db.Text, nullable=True)
     
      # Relationships
-    product = db.relationship('Products', backref=db.backref('reviews', lazy=True))
-    user = db.relationship('Users', backref=db.backref('reviews', lazy=True))
+    product = db.relationship('Product', backref=db.backref('reviews', lazy=True))
+    user = db.relationship('User', backref=db.backref('reviews', lazy=True))
 
     def __repr__(self):
         return f"<Review {self.id} for Product {self.product_id}>"

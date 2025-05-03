@@ -154,20 +154,18 @@ def get_promotion_detail_repo(promotion_id):
 def list_active_promotions_repo():
     now_ = now()
     return (
-        db.session.execute(
+        db.paginate(
             db.select(Promotion)
             .filter(
                 Promotion.start_date <= now_, Promotion.end_date >= now_
             )
             .order_by(Promotion.end_date)
         )
-        .scalars()
-        .all()
     )
 
 
 def list_all_promotions_repo():
-    return db.session.execute(db.select(Promotion).order_by(Promotion.end_date)).scalars().all()
+    return db.paginate(db.select(Promotion).order_by(Promotion.end_date))
 
 
 def get_promotion_by_id_repo(promotion_id):

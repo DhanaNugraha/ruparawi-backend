@@ -106,6 +106,9 @@ def list_products_view(request_args):
         products_response = []
 
         for product in paginated_product.items:
+            # update rating stats
+            product.update_rating_stats()
+
             # get primary image
             primary_image = get_product_primary_image_repo(product.id)
 
@@ -119,6 +122,8 @@ def list_products_view(request_args):
                     category_id=product.category_id,
                     tags=product.tags,
                     vendor_id=product.vendor_id,
+                    review_count=product.review_count,
+                    average_rating=product.average_rating,
                 ).model_dump()
             )
 
@@ -145,6 +150,7 @@ def list_products_view(request_args):
         ), 400
 
     except Exception as e:
+        db.session.rollback()
         return jsonify(
             {"message": str(e), "success": False, "location": "view list products repo"}
         ), 500
@@ -157,7 +163,9 @@ def get_product_detail_view(product_id):
     try:
         product = get_product_detail_repo(product_id)
 
-        # pls check this
+        # update_rating
+        product.update_rating_stats()
+
         serialized_product = ProductDetailResponse.model_validate(
             product
         ).model_dump()
@@ -481,11 +489,17 @@ def get_promotions_view():
         promotions = list_active_promotions_repo()
 
         promotions_response = [
-            PromotionListResponse.model_validate(promotion).model_dump() for promotion in promotions
+            PromotionListResponse.model_validate(promotion).model_dump() for promotion in promotions.items
         ]
 
         return jsonify(
             {
+                "pagination": {
+                    "total": promotions.total,
+                    "pages": promotions.pages,
+                    "current_page": promotions.page,
+                    "per_page": promotions.per_page,
+                },
                 "success": True,
                 "message": "Promotions fetched successfully",
                 "promotions": promotions_response,
