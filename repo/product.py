@@ -99,7 +99,15 @@ def process_sustainability_repo(sustainability_attributes, product):
 
 def get_products_list_repo(product_filter, request_args):
     # base query
-    products = db.select(Product).filter_by(is_active=True)
+    products = (
+        db.select(Product)
+        .options(
+            db.joinedload(Product.images),
+            db.joinedload(Product.tags),
+            db.joinedload(Product.sustainability_attributes),
+        )
+        .filter_by(is_active=True)
+    )
     
     # extra filters if any
     if product_filter.category_id:

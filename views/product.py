@@ -106,13 +106,18 @@ def list_products_view(request_args):
         products_response = []
 
         for product in paginated_product.items:
-            # update rating stats
-            product.update_rating_stats()
+            # # update rating stats
+            # product.update_rating_stats()
+
+            # get primary image
+            primary_image = next(
+                (img.image_url for img in product.images if img.is_primary), None
+            )
 
             # serialize data
             products_response.append(
                 ProductListResponse(
-                    primary_image_url=[image.image_url for image in product.images if image.is_primary],
+                    primary_image_url=primary_image,
                     id=product.id,
                     name=product.name,
                     price=product.price,
@@ -120,7 +125,7 @@ def list_products_view(request_args):
                     tags=product.tags,
                     vendor_id=product.vendor_id,
                     review_count=product.review_count,
-                    average_rating=product.average_rating,
+                    average_rating=product.average_rating if product.average_rating else 0.0,
                 ).model_dump()
             )
 
