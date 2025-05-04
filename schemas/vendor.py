@@ -179,6 +179,7 @@ class VendorUpdateRequest(BaseModel):
     @field_validator("business_logo_url")
     def validate_url(cls, value):
         if not value:
+            print("here")
             return value
 
         # Basic URL regex pattern

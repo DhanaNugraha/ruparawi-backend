@@ -1,8 +1,8 @@
+from datetime import timedelta
 import pytest
 from config.settings import cors_setup, create_app
 from instance.database import db as _db
 import models
-from models.user import UserRole
 from shared.time import datetime_from_string, now
 import os
 
@@ -242,32 +242,6 @@ def pending_vendor_profile_inject(test_app):
     
 
 @pytest.fixture
-def admin_log_data_inject(test_app):
-    admin_log_data = [
-        {
-            "id": 1,
-            "admin_id": 1,
-            "action": "POST /admin/category",
-        },
-        {
-            "id": 2,
-            "admin_id": 1,
-            "action": "PUT /admin/category/9",
-        },
-    ]
-    with test_app.app_context():
-        admin_log_list = []
-        for admin_log in admin_log_data:
-            admin_log_model = models.AdminLog(**admin_log)
-            admin_log_list.append(admin_log_model)
-
-        _db.session.add_all(admin_log_list)
-        _db.session.commit()
-
-        return admin_log_list
-    
-
-@pytest.fixture
 def cart_item_data_inject(test_app):
     cart_item_data = [
         {
@@ -339,6 +313,113 @@ def payment_method_data_inject(test_app):
 
         return payment_method_list
     
+
+@pytest.fixture
+def order_data_inject(test_app):
+    order_data = [
+        {
+            "id": 1,
+            "user_id": 1,
+            "total_amount": 100.00,
+            "shipping_address_id": 1,
+            "billing_address_id": 1,
+            "payment_method_id": 1,
+            "payment_status": "pending",
+            "tracking_number": "1234567890",
+            "notes": "Order notes",
+            "created_at": datetime_from_string(str(now())),
+            "order_number": "1234567890",
+        }
+    ]
+    with test_app.app_context():
+        order_list = []
+        for order in order_data:
+            order_model = models.Order(**order)
+            order_list.append(order_model)
+
+        _db.session.add_all(order_list)
+        _db.session.commit()
+
+        return order_list
+    
+
+@pytest.fixture
+def order_item_data_inject(test_app):
+    order_item_data = [
+        {
+            "id": 1,
+            "order_id": 1,
+            "product_id": 1,
+            "quantity": 2,
+            "unit_price": 10.00,
+            "total_price": 20.00,
+            "vendor_id": 1,
+        },
+        {
+            "id": 2,
+            "order_id": 1,
+            "product_id": 2,
+            "quantity": 1,
+            "unit_price": 10.00,
+            "total_price": 10.00,
+            "vendor_id": 1,
+        },
+    ]
+    with test_app.app_context():
+        order_item_list = []
+        for order_item in order_item_data:
+            order_item_model = models.OrderItem(**order_item)
+            order_item_list.append(order_item_model)
+
+        _db.session.add_all(order_item_list)
+        _db.session.commit()
+
+        return order_item_list
+    
+
+@pytest.fixture
+def promotions_data_inject(test_app):
+    promotions_data = [
+        {
+            "id": 1,
+            "title": "Test Promotion",
+            "description": "This is a test promotion",
+            "promo_code": "TESTPROMO",
+            "discount_value": 10.00,
+            "promotion_type": "percentage_discount",
+            "start_date": datetime_from_string(str(now() - timedelta(days=7))),
+            "end_date": datetime_from_string(str(now() + timedelta(days=6))),
+            "admin_id": 1,
+            "image_url": None,
+            "max_discount": None,
+            "usage_limit": 1,
+        },
+        {
+            "id": 2,
+            "title": "Test Promotion",
+            "description": "This is a test promotion",
+            "promo_code": "TESTPROMO2",
+            "discount_value": 10.00,
+            "promotion_type": "percentage_discount",
+            "start_date": datetime_from_string(str(now() - timedelta(days=7))),
+            "end_date": datetime_from_string(str(now() - timedelta(days=6))),
+            "admin_id": 1,
+            "image_url": None,
+            "max_discount": None,
+            "usage_limit": 1,
+        },
+    ]
+    with test_app.app_context():
+        promotions_list = []
+        for promotions in promotions_data:
+            promotions_model = models.Promotion(**promotions)
+            promotions_list.append(promotions_model)
+
+        _db.session.add_all(promotions_list)
+        _db.session.commit()
+
+        return promotions_list
+
 
 @pytest.fixture
 def mock_user_data():
@@ -479,6 +560,17 @@ def mock_vendor_apply_data():
     }
 
 @pytest.fixture
+def mock_vendor_update_data():
+    return {
+        "business_name": "Eco Foods updated",
+        "business_email": "vendorupdated@ecofoods.com",
+        "business_phone": "+1234567890",
+        "business_address": "123 Green St, Eco City",
+        "business_description": "Organic food supplier",
+        "business_logo_url": "https://example.com/profile.jpg",
+    }
+
+@pytest.fixture
 def mock_admin_vendor_review_data():
     return {"action": "approve", "reason": "testing"}
 
@@ -532,4 +624,19 @@ def mock_update_payment_method_data():
         "account_number": "4111111111111111",
         "expiry_date": "2040-12-31",
         "is_default": True,
+    }
+
+
+@pytest.fixture
+def mock_promotion_data():
+    return {
+        "title": "Test Promotion",
+        "description": "This is a test promotion",
+        "promo_code": "TESTPROMO",
+        "discount_value": 10.00,
+        "promotion_type": "percentage_discount",
+        "start_date": "2000-12-31",
+        "end_date": "2100-12-31",
+        "usage_limit": 1,
+        "product_ids": [1, 2],
     }

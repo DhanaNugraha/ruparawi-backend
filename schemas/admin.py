@@ -1,9 +1,10 @@
-from datetime import datetime
+from datetime import date, datetime
 import re
 from typing import List, Optional
 from pydantic import BaseModel, ConfigDict, field_validator
 
 from models.product import PromotionType
+from shared.time import datetime_from_date_string
 
 
 class CategoryCreate(BaseModel):
@@ -117,8 +118,8 @@ class PromotionCreate(BaseModel):
     promo_code: str
     discount_value: float
     promotion_type: str
-    start_date: datetime
-    end_date: datetime
+    start_date: date | str
+    end_date: date | str
     image_url: Optional[str] = None
     max_discount: Optional[float] = None  # Required for percentage discounts
     usage_limit: Optional[int] = None
@@ -154,6 +155,14 @@ class PromotionCreate(BaseModel):
                 f"Invalid promotion type '{value}'. Must be one of: {valid_values}"
             )
         return value  # Return the validated string
+    
+    @field_validator("start_date")
+    def validate_start_date(cls, value):
+        return datetime_from_date_string(value)
+    
+    @field_validator("end_date")
+    def validate_end_date(cls, value):
+        return datetime_from_date_string(value)
 
     @field_validator("image_url")
     def validate_image_url(cls, value):

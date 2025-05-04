@@ -1,10 +1,9 @@
-from datetime import timedelta
 from sqlalchemy import distinct, extract, func
 from instance.database import db
 from models.order import Order, OrderItem
 from models.user import UserRole, VendorProfile, VendorStatus
 from shared.time import now
-from sqlalchemy.orm import joinedload
+
 
 
 def vendor_register_repo(user, vendor_data_validated):
@@ -70,11 +69,7 @@ def update_vendor_profile_repo(vendor_profile, vendor_data_validated):
     for field, value in vendor_data_validated.model_dump().items():
         # only update the field if it is not None
         if value is not None:
-            print(field, value)
             setattr(vendor_profile, field, value)
-
-
-    print(vendor_profile.business_name)
 
     db.session.commit()
 
@@ -87,6 +82,11 @@ def update_vendor_profile_repo(vendor_profile, vendor_data_validated):
 def get_vendor_stats_repo(user_id_):
     now_ = now()
     current_year = now_.year
+
+    # total orders = sum of order items
+    # total sales = sum of order items * quantity
+    # total revenue = sum of total price
+    # total customers = count of distinct users in order
 
     all_time_stats = (
         db.session.query(
@@ -129,10 +129,10 @@ def get_vendor_stats_repo(user_id_):
     ).all()
 
     return {
-        "total_revenue": all_time_stats.total_revenue,
-        "total_sales": all_time_stats.total_sales,
-        "total_orders": all_time_stats.total_orders,
-        "total_customers": all_time_stats.total_customers,
+        "total_revenue": round(float(all_time_stats.total_revenue), 2) if all_time_stats.total_revenue else 0.0, 
+        "total_sales": int(all_time_stats.total_sales) if all_time_stats.total_sales else 0,
+        "total_orders": int(all_time_stats.total_orders) if all_time_stats.total_orders else 0,
+        "total_customers": int(all_time_stats.total_customers) if all_time_stats.total_customers else 0, 
         "monthly_revenue": [
             {
                 "month": int(sale.month),
