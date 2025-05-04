@@ -40,6 +40,20 @@ promotion_product_association = db.Table(
     db.Column("created_at", db.DateTime, default=now()),
 )
 
+promotion_category_association = db.Table(
+    "promotion_category_association",
+    db.Column(
+        "promotion_id", db.Integer, db.ForeignKey("promotions.id"), primary_key=True
+    ),
+    db.Column(
+        "category_id",
+        db.Integer,
+        db.ForeignKey("product_categories.id"),
+        primary_key=True,
+    ),
+    db.Column("created_at", db.DateTime, default=now()),
+)
+
 promotion_order_association = db.Table(
     "promotion_order_association",
     db.Column(
@@ -58,7 +72,7 @@ promotion_order_association = db.Table(
 class ProductCategory(db.Model, BaseModel):
     __tablename__ = "product_categories"
 
-    name = db.Column(db.String(50), nullable=False)
+    name = db.Column(db.String(50), nullable=False, unique=True)
     description = db.Column(db.Text)
     parent_category_id = db.Column(db.Integer, db.ForeignKey("product_categories.id"))
     is_active = db.Column(db.Boolean, default=True)
@@ -68,6 +82,8 @@ class ProductCategory(db.Model, BaseModel):
         "ProductCategory",
         backref=db.backref("parent", remote_side="ProductCategory.id"),
     )
+    # Relationship
+    products = db.relationship("Product", backref="category", lazy=True)
 
 
 class SustainabilityAttribute(db.Model, BaseModel):
@@ -184,6 +200,14 @@ class Promotion(db.Model, BaseModel):
     products = db.relationship(
         "Product", secondary="promotion_product_association", backref="promotions"
     )
+
+    categories = db.relationship(
+        "ProductCategory",
+        secondary="promotion_category_association",
+        backref=db.backref("promotions", lazy="dynamic"),
+        lazy="dynamic",
+    )
+
     admin = db.relationship("User", backref="created_promotions")
 
     orders = db.relationship(

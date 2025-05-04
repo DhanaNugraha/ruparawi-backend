@@ -440,6 +440,8 @@ class PromotionListResponse(BaseModel):
     image_url: Optional[str]
     usage_limit: int
     products: List[object] | str = []
+    max_discount: Optional[float]
+    discount_value: float
 
     @field_validator("products")
     def validate_product_ids(cls, value):
@@ -465,6 +467,7 @@ class PromotionDetailResponse(BaseModel):
     max_discount: Optional[float] = None  # Required for percentage discounts
     usage_limit: Optional[int]
     products: List[object] | str = []
+    categories: List[object] | str = []
     created_at: datetime
     updated_at: datetime
     is_active: bool
@@ -473,6 +476,12 @@ class PromotionDetailResponse(BaseModel):
     def validate_product_ids(cls, value):
         # repr to convert class object to string
         return repr([product.id for product in value])
+    
+    @field_validator("categories")
+    def validate_category_name(cls, value):
+        # repr to convert class object to string
+        return repr([category.name for category in value])
+
 
     model_config = ConfigDict(
         from_attributes=True,  # Can read SQLAlchemy model

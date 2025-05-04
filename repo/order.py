@@ -194,14 +194,26 @@ def validate_promotion_repo(promo_code, cart_items):
         return {"valid": False, "error": "Promotion not active"}
 
     # Get eligible product IDs for this promotion
-    eligible_ids = [product.id for product in promotion.products] if promotion.products else []
+    eligible_product_ids = set()
+
+    print(eligible_product_ids)
+
+    # Products directly added to promotion
+    if promotion.products:
+        eligible_product_ids.update(product.id for product in promotion.products)
+
+    # Products from promotion categories
+    if promotion.categories:
+        for category in promotion.categories:
+            eligible_product_ids.update(product.id for product in category.products)
 
     # convert to list
-    cart_product_id_list = [item.product_id for item in cart_items]
+    cart_product_ids = {item.product_id for item in cart_items}
 
-    # Separate eligible vs non-eligible items
-    eligible_items = [product_id for product_id in cart_product_id_list if product_id in eligible_ids]
+    # finds the intersection
+    eligible_items = list(cart_product_ids & eligible_product_ids)
 
+    # No eligible items
     if not eligible_items:
         return {"valid": False, "error": "No eligible items in cart"}
 
@@ -218,35 +230,33 @@ def validate_promotion_repo(promo_code, cart_items):
 
 def apply_promotion_to_order_repo(order, promotion, eligible_item_ids):
     # convert to list
-    order_item_list = [item for item in order.items]
+    eligible_order_items = [
+        item for item in order.items if item.product_id in eligible_item_ids
+    ]
 
-    print(order_item_list)
-
-    eligible_order_items = [item for item in order_item_list if item.product_id in eligible_item_ids]
-
-    print(eligible_order_items)
+    if not eligible_order_items:
+        return order, 0.0
 
     # Calculate discount
     if promotion.promotion_type == "percentage_discount":
         subtotal = sum(item.total_price for item in eligible_order_items)
-        print(subtotal)
+
         # discount will be less than or equal to max_discount
         discount = min(
             subtotal * (promotion.discount_value / 100),
             promotion.max_discount
+            or float("inf")  # Handle case where max_discount is None
         )
-        print(discount)
+
 
     elif promotion.promotion_type == "fixed_discount":
         discount = promotion.discount_value * len(eligible_order_items)
 
-    # Apply discount
-    print(order.total_amount)
-    order.total_amount -= discount
-    print(order.total_amount, "after discount")
+    else:
+        discount = 0.0
 
-    if order.total_amount < 0:
-        order.total_amount = 0
+    # Apply discount, prevent negatives
+    order.total_amount = max(order.total_amount - discount, 0)
 
     # Record the promotion usage
     db.session.execute(

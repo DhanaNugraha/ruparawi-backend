@@ -123,7 +123,8 @@ class PromotionCreate(BaseModel):
     image_url: Optional[str] = None
     max_discount: Optional[float] = None  # Required for percentage discounts
     usage_limit: Optional[int] = None
-    product_ids: List[int] = []
+    product_ids: Optional[List[int]] = []
+    category_names: Optional[List[str]] = []
 
     @field_validator("title")
     def validate_title(cls, value):
@@ -213,6 +214,7 @@ class PromotionUpdate(BaseModel):
     max_discount: Optional[float] = None  # Required for percentage discounts
     usage_limit: Optional[int] = None
     product_ids: List[int] = None
+    category_names: Optional[List[str]] = None
 
     @field_validator("title")
     def validate_title(cls, value):
