@@ -1,10 +1,9 @@
 from models.testimonial import VendorTestimonial
 from instance.database import db
 
-def create_testimonial(vendor_id, admin_id, message):
+def create_testimonial(vendor_id, message):
     testimonial = VendorTestimonial(
         vendor_id=vendor_id,
-        admin_id=admin_id,
         message=message
     )
     db.session.add(testimonial)
