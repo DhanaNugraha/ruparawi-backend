@@ -146,6 +146,15 @@ def add_products_to_promotion_repo(promotion, product_ids_list):
 
         promotion.products.append(product)
 
+def add_categories_to_promotion_repo(promotion, category_name_list):
+    for category_name in category_name_list:
+        category = db.one_or_404(
+            db.select(ProductCategory).filter_by(name=category_name),
+            description=f"Category does not exist '{category_name}'.",
+        )
+
+        promotion.categories.append(category)
+
 
 def get_promotion_detail_repo(promotion_id):
     return db.one_or_404(db.select(Promotion).filter_by(id=promotion_id))
