@@ -1,8 +1,6 @@
 from instance.database import db
-from models.product import Product, ProductCategory, ProductImage, Promotion, SustainabilityAttribute, ProductTag, Wishlist
-from sqlalchemy.orm import joinedload
+from models.product import Product, ProductCategory, ProductImage, SustainabilityAttribute, ProductTag, Wishlist
 
-from models.user import User
 
 
 def create_product_repo(product_data, user_id):

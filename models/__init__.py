@@ -13,6 +13,7 @@ from .product import (
     Product,
     ProductImage,
     ProductTag,
+    Promotion,
 )
 from .order import (
     ShoppingCart, 
@@ -56,4 +57,5 @@ __all__ = [
     "Article",
     "VendorTestimonial",
     "UserRole",
+    "Promotion",
 ]

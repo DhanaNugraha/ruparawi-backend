@@ -339,7 +339,7 @@ def create_promotion_view(promotion_data, user):
                 "message": "Promotion created successfully",
                 "promotion": PromotionDetailResponse.model_validate(promotion).model_dump(),
             }
-        ), 200
+        ), 201
 
     except ValidationError as e:
         return jsonify(
