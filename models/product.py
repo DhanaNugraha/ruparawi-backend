@@ -108,7 +108,7 @@ class Product(db.Model, BaseModel):
     cart_items = db.relationship("CartItem", backref="product", lazy=True)
     order_items = db.relationship("OrderItem", backref="product", lazy=True)
 
-    def update_rating_stats(self):
+    def update_rating_stats(self, commit=False):
         # Recalculates average rating and review count
         reviews = self.reviews
         if reviews:
@@ -118,7 +118,9 @@ class Product(db.Model, BaseModel):
         else:
             self.average_rating = 0.00
             self.review_count = 0
-        db.session.commit()
+        if commit:
+            db.session.commit()
+
 
 
 class ProductImage(db.Model, BaseModel):
