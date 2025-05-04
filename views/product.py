@@ -126,6 +126,7 @@ def list_products_view(request_args):
                     vendor_id=product.vendor_id,
                     review_count=product.review_count,
                     average_rating=product.average_rating if product.average_rating else 0.0,
+                    business_name=product.vendor.vendor_profile.business_name,
                 ).model_dump()
             )
 
