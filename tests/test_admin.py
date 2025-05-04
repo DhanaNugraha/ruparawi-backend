@@ -492,7 +492,7 @@ def test_get_all_promotions(
     assert get_all_promotions.json["pagination"]["pages"] == 2
 
     assert len(get_all_promotions.json["promotions"]) == 1
-    assert len(get_all_promotions.json["promotions"][0]) == 10
+    assert len(get_all_promotions.json["promotions"][0]) == 12
 
 
 # ---------------------------------------------------------------------------- Create promotion ----------------------------------------------------------------------------

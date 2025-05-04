@@ -5,6 +5,7 @@ from pydantic import ValidationError
 from instance.database import db
 from models.user import VendorStatus
 from repo.admin import (
+    add_categories_to_promotion_repo,
     check_parent_category_repo,
     create_article_repo,
     create_category_repo,
@@ -331,6 +332,12 @@ def create_promotion_view(promotion_data, user):
                 promotion, promotion_data_validated.product_ids
             )
 
+        # process categories
+        if promotion_data_validated.category_names:
+            add_categories_to_promotion_repo(
+                promotion, promotion_data_validated.category_names
+            )
+
         db.session.commit()
 
         return jsonify(
@@ -376,6 +383,14 @@ def update_promotion_view(promotion_id, promotion_data):
 
             add_products_to_promotion_repo(
                 promotion, promotion_data_validated.product_ids
+            )
+
+        # process categories
+        if promotion_data_validated.category_names:
+            promotion.categories.clear()
+            
+            add_categories_to_promotion_repo(
+                promotion, promotion_data_validated.category_names
             )
 
         db.session.commit()
