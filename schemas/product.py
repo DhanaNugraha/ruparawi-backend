@@ -168,6 +168,7 @@ class ProductListResponse(BaseModel):
     primary_image_url: list | str | None = None
     review_count: int | None
     average_rating: float | None
+    business_name: str
 
     @field_validator("tags")
     def validate_tags(cls, value):

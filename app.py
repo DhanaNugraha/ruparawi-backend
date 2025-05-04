@@ -10,4 +10,3 @@ app = create_app(config_module)
 
 cors_setup(app)
 
-

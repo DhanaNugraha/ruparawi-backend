@@ -4,6 +4,7 @@ from auth.jwt import init_jwt
 import models
 import router
 from config import configure_app
+from scheduled.jobs import scheduled_job_setup
 
 
 def create_app(config_module = "config.local"):
@@ -12,6 +13,7 @@ def create_app(config_module = "config.local"):
     init_db(app)
     init_jwt(app)
     configure_app()
+    scheduled_job_setup(app)
     app.register_blueprint(router.auth_router)
     app.register_blueprint(router.user_router)
     app.register_blueprint(router.products_router)
@@ -49,3 +51,5 @@ def cors_setup(app):
     @app.route("/<path:path>", methods=["OPTIONS"])
     def handle_options(path):
         return "", 204  # No content response for preflight
+
+
