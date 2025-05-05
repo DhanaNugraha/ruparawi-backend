@@ -22,12 +22,14 @@ def create_product_repo(product_data, user_id):
 
 def process_product_images_repo(primary_image, images_list, product_id):
     for image_url in images_list:
+        print("image_url", image_url)
         product_image = ProductImage(
             product_id=product_id,
             image_url=image_url,
         )
 
         db.session.add(product_image)
+
 
     product_image = ProductImage(
         product_id=product_id,
@@ -216,14 +218,6 @@ def get_wishlist_by_user_id_repo(user_id):
     )
 
 
-def get_product_primary_image_repo(product_id):
-    return db.session.execute(
-        db.select(ProductImage.image_url)
-        .filter_by(product_id=product_id, is_primary=True)
-    ).scalar_one_or_none()
-
-
-
 # ----------------------------------------------------------- Categories -----------------------------------------------------------
 
 
@@ -235,7 +229,6 @@ def get_top_level_categories_repo():
             )
         )
         .scalars()
-        .all()
     )
 
 

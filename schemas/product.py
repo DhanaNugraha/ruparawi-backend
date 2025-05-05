@@ -18,7 +18,7 @@ class ProductCreateRequest(BaseModel):
     sustainability_attributes: List[str] = []
     stock_quantity: int
     min_order_quantity: int = 1
-    primary_image_url: str = None
+    primary_image_url: str 
     images: List[str] = []
 
     @field_validator("name")
@@ -382,17 +382,17 @@ class VendorProductsResponse(BaseModel):
     @field_validator("tags")
     def validate_tags(cls, value):
         # repr to convert class object to string
-        return repr([tag.name for tag in value])
+        return [tag.name for tag in value]
 
     @field_validator("sustainability_attributes")
     def validate_sustainability_attributes(cls, value):
         # repr to convert class object to string
-        return repr([tag.name for tag in value])
+        return [tag.name for tag in value]
     
     @field_validator("images")
     def validate_images(cls, value):
         # repr to convert class object to string
-        return repr([{"image_url": image.image_url, "is_primary": image.is_primary} for image in value])
+        return [{"image_url": image.image_url, "is_primary": image.is_primary} for image in value]
 
     model_config = ConfigDict(
         from_attributes=True,  # Can read SQLAlchemy model
@@ -409,16 +409,6 @@ class WishlistProductResponse(BaseModel):
     price: float
     average_rating: Optional[float] = None
     primary_image: Optional[str] = None
-
-    model_config = ConfigDict(
-        from_attributes=True,  # Can read SQLAlchemy model
-        extra="ignore",  # ignore extra fields
-    )
-
-
-class WishlistResponse(BaseModel):
-    products: List[WishlistProductResponse]
-    count: Optional[int]
 
     model_config = ConfigDict(
         from_attributes=True,  # Can read SQLAlchemy model

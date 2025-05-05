@@ -184,13 +184,13 @@ def get_vendor_recent_orders_view(user):
                 "success": True,
                 "recent_orders": [
                     {
-                        "order_id": order[0].id,
-                        "product": order[1].product.name,
-                        "customer": order[0].customer.username,
-                        "qty": order[1].quantity,
-                        "total": order[1].total_price,
-                        "order_date": order[0].created_at,
-                        "order_status": order[0].status,
+                        "order_id": order.id,
+                        "product": order.product_name,
+                        "customer": order.customer_username,
+                        "qty": order.quantity,
+                        "total": round(float(order.total_price), 2),
+                        "order_date": order.created_at,
+                        "order_status": order.status,
                     }
                     for order in recent_orders
                 ],

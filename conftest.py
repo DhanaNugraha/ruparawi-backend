@@ -119,7 +119,7 @@ def products_data_inject(test_app):
             "description": "Description 2",
             "price": 19.99,
             "category_id": 2,
-            "vendor_id": 2,
+            "vendor_id": 1,
             "stock_quantity": 5,
             "min_order_quantity": 1,
             "average_rating": 4.0,
@@ -139,7 +139,52 @@ def products_data_inject(test_app):
         _db.session.commit()
 
         return products_list
-    
+
+
+@pytest.fixture
+def products_data_different_vendors_inject(test_app):
+    products_data = [
+        {
+            "id": 1,
+            "name": "Product 1",
+            "description": "Description 1",
+            "price": 10.99,
+            "category_id": 1,
+            "vendor_id": 1,
+            "stock_quantity": 10,
+            "min_order_quantity": 1,
+            "average_rating": 4.5,
+            "review_count": 5,
+            "is_active": True,
+            "created_at": datetime_from_string(str(now())),
+            "updated_at": datetime_from_string(str(now())),
+        },
+        {
+            "id": 2,
+            "name": "Product 2",
+            "description": "Description 2",
+            "price": 19.99,
+            "category_id": 2,
+            "vendor_id": 2,
+            "stock_quantity": 5,
+            "min_order_quantity": 1,
+            "average_rating": 4.0,
+            "review_count": 3,
+            "is_active": True,
+            "created_at": datetime_from_string(str(now())),
+            "updated_at": datetime_from_string(str(now())),
+        },
+    ]
+    with test_app.app_context():
+        products_list = []
+        for product in products_data:
+            product_model = models.Product(**product)
+            products_list.append(product_model)
+
+        _db.session.add_all(products_list)
+        _db.session.commit()
+
+        return products_list
 
 
 @pytest.fixture
@@ -194,13 +239,23 @@ def approved_vendor_profile_inject(test_app):
     vendor_profile_data = [
         {
             "user_id": 1,
-            "vendor_status" : "approved",
+            "vendor_status": "approved",
             "business_name": "Eco Foods",
             "business_email": "vendor@ecofoods.com",
             "business_phone": "+1234567890",
             "business_address": "123 Green St, Eco City",
             "business_description": "Organic food supplier",
-            "business_logo_url" : "https://example.com/profile.jpg"
+            "business_logo_url": "https://example.com/profile.jpg",
+        },
+        {
+            "user_id": 2,
+            "vendor_status": "approved",
+            "business_name": "Eco Foods",
+            "business_email": "vendor@ecofoods.com",
+            "business_phone": "+1234567890",
+            "business_address": "123 Green St, Eco City",
+            "business_description": "Organic food supplier",
+            "business_logo_url": "https://example.com/profile.jpg",
         },
     ]
     with test_app.app_context():
@@ -505,6 +560,7 @@ def mock_create_product_data():
         "sustainability_attributes": ["organic", "carbon-neutral"],
         "stock_quantity": 100,
         "min_order_quantity": 2,
+        "primary_image_url": "https://example.com/image.jpg",
     }
 
 @pytest.fixture
@@ -518,7 +574,8 @@ def mock_multiple_create_product_data():
             "sustainability_attributes": ["organic", "carbon-neutral"],
             "stock_quantity": 100,
             "min_order_quantity": 2,
-            "category_id": 1
+            "category_id": 1,
+            "primary_image_url": "https://example.com/image.jpg",
         },
         {
             "name": "testproduct 2",
@@ -528,7 +585,8 @@ def mock_multiple_create_product_data():
             "sustainability_attributes": ["organic", "carbon-neutral"],
             "stock_quantity": 100,
             "min_order_quantity": 2,
-        }
+            "primary_image_url": "https://example.com/image.jpg",
+        },
     ]
 
 

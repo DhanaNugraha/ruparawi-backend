@@ -122,7 +122,6 @@ def get_all_address_repo(user):
             db.select(UserAddress).filter_by(user_id=user.id)
         )
         .scalars()
-        .all()
     )
 
 
