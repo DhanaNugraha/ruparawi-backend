@@ -993,7 +993,7 @@ def test_create_article(
     assert create_article.status_code == 201
     assert create_article.json["success"] is True
     assert create_article.json["message"] == "Article created successfully"
-    assert len(article_response) == 6
+    assert len(article_response) == 8
     assert (set(article_response.values()) & set(mock_article_data.values())) == set(
         mock_article_data.values()
     )
@@ -1069,7 +1069,7 @@ def test_create_article_content_validation_error(
 
     assert create_article.status_code == 400
     assert create_article.json["success"] is False
-    assert create_article.json["message"] == "Content must be at least 500 characters"
+    assert create_article.json["message"] == "Content must be at least 250 characters"
     assert create_article.json["location"] == "view create article validation"
 
     # content too long
@@ -1108,7 +1108,7 @@ def test_get_all_article(
     assert get_articles.json["success"] is True
     assert get_articles.json["message"] == "Articles retrieved successfully"
     assert len(get_articles.json["articles"]) == 1
-    assert len(get_articles.json["articles"][0]) == 6
+    assert len(get_articles.json["articles"][0]) == 8
 
 
 # ---------------------- Get Article Detail ----------------------
@@ -1133,7 +1133,7 @@ def test_get_article_by_id(
     assert get_article_by_id.status_code == 200
     assert get_article_by_id.json["success"] is True
     assert get_article_by_id.json["message"] == "Article retrieved successfully"
-    assert len(get_article_by_id.json["article"]) == 6
+    assert len(get_article_by_id.json["article"]) == 8
 
 
 def test_get_article_by_id_repo_error(
@@ -1177,7 +1177,7 @@ def test_update_article(
     assert update_article.status_code == 200
     assert update_article.json["success"] is True
     assert update_article.json["message"] == "Article updated successfully"
-    assert len(update_article.json["article"]) == 6
+    assert len(update_article.json["article"]) == 8
 
 
 
@@ -1229,7 +1229,7 @@ def test_update_article_content_validation_error(
 
     assert update_article.status_code == 400
     assert update_article.json["success"] is False
-    assert update_article.json["message"] == "Content must be at least 500 characters"
+    assert update_article.json["message"] == "Content must be at least 250 characters"
     assert update_article.json["location"] == "view update article validation"
 
     # content too long
