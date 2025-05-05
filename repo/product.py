@@ -218,14 +218,6 @@ def get_wishlist_by_user_id_repo(user_id):
     )
 
 
-def get_product_primary_image_repo(product_id):
-    return db.session.execute(
-        db.select(ProductImage.image_url)
-        .filter_by(product_id=product_id, is_primary=True)
-    ).scalar_one_or_none()
-
-
-
 # ----------------------------------------------------------- Categories -----------------------------------------------------------
 
 
@@ -237,7 +229,6 @@ def get_top_level_categories_repo():
             )
         )
         .scalars()
-        .all()
     )
 
 

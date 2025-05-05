@@ -153,8 +153,7 @@ class Wishlist(db.Model, BaseModel):
     products = db.relationship(
         "Product",
         secondary=wishlist_association,
-        backref=db.backref("wishlisted_by", lazy="dynamic"),
-        lazy="dynamic",
+        backref="wishlisted_by"
     )
 
     def add_product(self, product):
