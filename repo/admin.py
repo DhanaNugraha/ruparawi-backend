@@ -89,8 +89,13 @@ def soft_delete_category_repo(category_id):
 # ------------------ ARTICLE ------------------
 
 
-def create_article_repo(title, content, author_id):
-    article = Article(title=title, content=content, author_id=author_id)
+def create_article_repo(title, content, author_id, image_url):
+    article = Article(
+        title=title,
+        content=content,
+        image_url=image_url,
+        author_id=author_id,
+    )
     db.session.add(article)
     db.session.commit()
     return article

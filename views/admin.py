@@ -469,6 +469,7 @@ def create_article_view(data):
     try:
         title = data.get("title")
         content = data.get("content")
+        image_url = data.get("image_url") or "https://example.com/default-image.png"
 
         if not title or not content:
             return jsonify(
@@ -488,11 +489,11 @@ def create_article_view(data):
                 }
             ), 400
 
-        if len(content) < 500:
+        if len(content) < 250:
             return jsonify(
                 {
                     "success": False,
-                    "message": "Content must be at least 500 characters",
+                    "message": "Content must be at least 250 characters",
                     "location": "view create article validation",
                 }
             ), 400
@@ -506,7 +507,7 @@ def create_article_view(data):
                 }
             ), 400
 
-        new_article = create_article_repo(title, content, current_user.id)
+        new_article = create_article_repo(title, content, current_user.id, image_url)
 
         return jsonify(
             {
@@ -516,7 +517,9 @@ def create_article_view(data):
                     "id": new_article.id,
                     "title": new_article.title,
                     "content": new_article.content,
+                    "image_url": new_article.image_url,
                     "author_id": new_article.author_id,
+                    "author_name": new_article.author.name,
                     "created_at": new_article.created_at.isoformat(),
                     "updated_at": new_article.updated_at.isoformat(),
                 },
@@ -542,7 +545,9 @@ def get_articles_view():
                 "id": article.id,
                 "title": article.title,
                 "content": article.content,
+                "image_url": article.image_url or "https://example.com/default-image.png",
                 "author_id": article.author_id,
+                "author_name": article.author.name,
                 "created_at": article.created_at.isoformat(),
                 "updated_at": article.updated_at.isoformat(),
             }
@@ -570,7 +575,9 @@ def get_article_by_id_view(article_id):
             "id": article.id,
             "title": article.title,
             "content": article.content,
+            "image_url": article.image_url or "https://example.com/default-image.png",
             "author_id": article.author_id,
+            "author_name": article.author.name,
             "created_at": article.created_at.isoformat(),
             "updated_at": article.updated_at.isoformat(),
         }
@@ -616,11 +623,11 @@ def update_article_view(data, article_id):
             article.title = title
 
         if content:
-            if len(content) < 500:
+            if len(content) < 250:
                 return jsonify(
                     {
                         "success": False,
-                        "message": "Content must be at least 500 characters",
+                        "message": "Content must be at least 250 characters",
                         "location": "view update article validation",
                     }
                 ), 400
@@ -644,7 +651,9 @@ def update_article_view(data, article_id):
                     "id": article.id,
                     "title": article.title,
                     "content": article.content,
+                    "image_url": article.image_url or "https://example.com/default-image.png",
                     "author_id": article.author_id,
+                    "author_name": article.author.name,
                     "created_at": article.created_at.isoformat(),
                     "updated_at": article.updated_at.isoformat(),
                 },
