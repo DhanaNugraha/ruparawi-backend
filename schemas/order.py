@@ -6,7 +6,7 @@ from models.order import OrderStatus
 
 
 class CartItemCreate(BaseModel):
-    product_id: int 
+    product_id: int
     quantity: int = 1
 
     @field_validator("product_id")
@@ -15,7 +15,7 @@ class CartItemCreate(BaseModel):
             raise ValueError("Product ID cannot be negative")
 
         return value
-    
+
     @field_validator("quantity")
     def validate_quantity(cls, value):
         if value < 0 or value > 1000:
@@ -25,7 +25,7 @@ class CartItemCreate(BaseModel):
 
 
 class CartItemUpdate(BaseModel):
-    quantity: int 
+    quantity: int
 
     @field_validator("quantity")
     def validate_quantity(cls, value):
@@ -43,6 +43,7 @@ class ProductBase(BaseModel):
         from_attributes=True,  # Can read SQLAlchemy model
         extra="ignore",  # ignore extra fields
     )
+
 
 class CartItemResponse(BaseModel):
     product_id: int
@@ -104,7 +105,6 @@ class OrderCreate(BaseModel):
     )
 
 
-
 class OrderStatusHistoryResponse(BaseModel):
     id: int
     status: str
@@ -124,13 +124,28 @@ class OrderResponse(BaseModel):
     status: str
     total_amount: float
     created_at: Optional[datetime] = None
-    items:  list | str
+    items: list | str
     status_history: list | str
 
     @field_validator("items")
     def validate_items(cls, value):
-        return repr([item.product.name for item in value])
-    
+        return repr(
+            [
+                {
+                    "name": item.product.name,
+                    "image_url": next(
+                        (
+                            img.image_url
+                            for img in item.product.images
+                            if img.is_primary
+                        ),
+                        None,
+                    ),
+                }
+                for item in value
+            ]
+        )
+
     @field_validator("status_history")
     def validate_status_history(cls, value):
         return repr([item.status for item in value])

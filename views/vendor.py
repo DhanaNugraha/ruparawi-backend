@@ -191,6 +191,7 @@ def get_vendor_recent_orders_view(user):
                         "total": round(float(order.total_price), 2),
                         "order_date": order.created_at,
                         "order_status": order.status,
+                        "image_url": order.image_url,
                     }
                     for order in recent_orders
                 ],

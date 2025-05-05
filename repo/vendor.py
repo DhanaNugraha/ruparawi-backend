@@ -1,7 +1,7 @@
 from sqlalchemy import distinct, extract, func
 from instance.database import db
 from models.order import Order, OrderItem
-from models.product import Product
+from models.product import Product, ProductImage
 from models.user import User, UserRole, VendorProfile, VendorStatus
 from shared.time import now
 
@@ -166,6 +166,7 @@ def get_vendor_recent_orders_repo(user):
             Order.created_at,
             Order.status,
             Product.name.label("product_name"),
+            ProductImage.image_url.label("image_url"),
             User.username.label("customer_username"),
             OrderItem.quantity,
             OrderItem.total_price,
@@ -173,7 +174,8 @@ def get_vendor_recent_orders_repo(user):
         .join(OrderItem, Order.id == OrderItem.order_id)
         .join(Product, OrderItem.product_id == Product.id)
         .join(User, Order.user_id == User.id)
-        .filter(OrderItem.vendor_id == user.id)
+        # .join(ProductImage, Product.id == ProductImage.product_id)
+        .filter(OrderItem.vendor_id == user.id, ProductImage.is_primary == True)
         .order_by(Order.created_at.desc())
         .limit(5)
         .all()

@@ -175,8 +175,8 @@ def get_all_orders_repo(user):
             db.select(Order).filter_by(user_id=user.id)
         )
         .scalars()
-        .all()
     )
+    
 
 
 # ----------------------------------------------------------- Promotions -----------------------------------------------------------
