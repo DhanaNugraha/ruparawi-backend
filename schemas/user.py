@@ -1,10 +1,12 @@
 import re
 from typing import List, Optional
+from typing_extensions import Annotated
 from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic.functional_validators import BeforeValidator
 from datetime import date, datetime
 
 from models.user import PaymentType
-from shared.time import date_now
+from shared.time import date_now, parse_mm_yy_date
 
 # -------------------------------------------------- Register User --------------------------------------------------
 class UserRoleResponse(BaseModel):
@@ -217,11 +219,15 @@ class UserAddressResponse(BaseModel):
 # -------------------------------------------------- Create user payment method --------------------------------------------------
 
 
+# Custom type that accepts both date objects and MM/YY strings
+MMYYDate = Annotated[date, BeforeValidator(parse_mm_yy_date)]
+
+
 class UserPaymentMethodBase(BaseModel):
     payment_type: str
     provider: str
     account_number: str
-    expiry_date: Optional[date] = None
+    expiry_date: Optional[MMYYDate] = None
     is_default: bool = False
 
     @field_validator("payment_type")
@@ -273,6 +279,21 @@ class UserPaymentMethodResponse(BaseModel):
     def validate_account_number(cls, value):
         # censor account number
         return value[:4] + "*" * (len(value) - 4)
+
+    model_config = ConfigDict(
+        from_attributes=True,  # Can read SQLAlchemy model
+        extra="ignore",  # ignore extra fields
+    )
+
+
+class UserPaymentMethodUnsecuredResponse(BaseModel):
+    id: int
+    user_id: int
+    payment_type: str
+    provider: str
+    account_number: str
+    created_at: datetime
+    updated_at: datetime
 
     model_config = ConfigDict(
         from_attributes=True,  # Can read SQLAlchemy model
