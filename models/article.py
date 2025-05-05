@@ -8,5 +8,4 @@ class Article(db.Model, BaseModel):
     content = db.Column(db.Text, nullable=False)
     image_url = db.Column(db.String(2048), nullable=True)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    
-    author = db.relationship("User", backref="articles")
+
