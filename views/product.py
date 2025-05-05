@@ -7,7 +7,6 @@ from repo.product import (
     create_product_repo,
     get_category_by_id_repo,
     get_product_detail_repo,
-    get_product_primary_image_repo,
     get_products_list_repo,
     get_top_level_categories_repo,
     get_wishlist_by_user_id_repo,
@@ -31,7 +30,6 @@ from schemas.product import (
     PromotionDetailResponse,
     PromotionListResponse,
     WishlistProductResponse,
-    WishlistResponse,
 )
 
 
@@ -107,7 +105,6 @@ def list_products_view(request_args):
 
         for product in paginated_product.items:
             # # update rating stats
-            # product.update_rating_stats()
 
             # get primary image
             primary_image = next(
@@ -394,26 +391,28 @@ def get_wishlist_view(user):
     try:
         wishlist = get_wishlist_by_user_id_repo(user.id)
 
-        wishlist_product_response = []
-
-        for product in wishlist.products.all():
-            primary_image = get_product_primary_image_repo(product.id)
-
-            wishlist_product_response.append(
-                WishlistProductResponse(
-                    primary_image=primary_image,
-                    **ProductDetailResponse.model_validate(product).model_dump(),
-                )
-            )
-
-        wishlist_response = WishlistResponse(
-            products=wishlist_product_response, count=len(wishlist_product_response)
-        )
+        wishlist_product_response = [
+            WishlistProductResponse(
+                id=product.id,
+                name=product.name,
+                price=float(product.price),
+                average_rating=float(product.average_rating)
+                if product.average_rating
+                else None,
+                primary_image=next(
+                    (img.image_url for img in product.images if img.is_primary), None
+                ),
+            ).model_dump()
+            for product in wishlist.products
+        ]
 
         return {
             "success": True,
             "message": "Wishlist fetched successfully",
-            "wishlist": wishlist_response.model_dump(),
+            "wishlist": {
+                "products": wishlist_product_response,
+                "count": len(wishlist_product_response),
+            },
         }, 200
 
     except Exception as e:
