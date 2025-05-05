@@ -18,7 +18,7 @@ class ProductCreateRequest(BaseModel):
     sustainability_attributes: List[str] = []
     stock_quantity: int
     min_order_quantity: int = 1
-    primary_image_url: str = None
+    primary_image_url: str 
     images: List[str] = []
 
     @field_validator("name")

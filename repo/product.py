@@ -22,12 +22,14 @@ def create_product_repo(product_data, user_id):
 
 def process_product_images_repo(primary_image, images_list, product_id):
     for image_url in images_list:
+        print("image_url", image_url)
         product_image = ProductImage(
             product_id=product_id,
             image_url=image_url,
         )
 
         db.session.add(product_image)
+
 
     product_image = ProductImage(
         product_id=product_id,

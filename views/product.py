@@ -311,7 +311,7 @@ def add_product_to_wishlist_view(user, product_id):
                     "message": "Product already in wishlist",
                     "success": False,
                 }
-            ), 404
+            ), 400
 
         return jsonify(
             {
