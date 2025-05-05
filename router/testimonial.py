@@ -6,7 +6,7 @@ from views.testimonial import render_testimonial_page
 
 testimonial_router = Blueprint("testimonial", __name__, url_prefix="/testimonial")
 
-@testimonial_router.route("/", methods=["POST"])
+@testimonial_router.route("", methods=["POST"])
 @jwt_required()
 @vendor_required
 def create_testimonial():

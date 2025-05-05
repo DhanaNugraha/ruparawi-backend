@@ -1,7 +1,7 @@
 import models
 
 # uv run pytest -v -s --cov=.
-# uv run pytest tests/test_product.py -v -s --cov=.
+# uv run pytest tests/test_product.py -v -s --cov=. --cov-report term-missing
 
 
 # ---------------------------------------------------------------------------- Create product Tests ----------------------------------------------------------------------------
@@ -14,6 +14,7 @@ def test_create_product(
     mock_vendor_data,
     db,
     approved_vendor_profile_inject,
+    roles_data_inject,
 ):
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
 
@@ -43,6 +44,7 @@ def test_create_product_not_vendor(
     mock_token_data,
     mock_user_data,
     pending_vendor_profile_inject,
+    roles_data_inject,
 ):
     register_user = client.post("/auth/register", json=mock_user_data)
 
@@ -63,6 +65,7 @@ def test_create_product_name_validation_error(
     mock_vendor_token_data,
     mock_vendor_data,
     approved_vendor_profile_inject,
+    roles_data_inject,
 ):
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
 
@@ -85,6 +88,7 @@ def test_create_product_description_validation_error(
     mock_vendor_token_data,
     mock_vendor_data,
     approved_vendor_profile_inject,
+    roles_data_inject,
 ):
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
 
@@ -107,6 +111,7 @@ def test_create_product_price_validation_error(
     mock_vendor_token_data,
     mock_vendor_data,
     approved_vendor_profile_inject,
+    roles_data_inject,
 ):
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
 
@@ -129,6 +134,7 @@ def test_create_product_tags_validation_error(
     mock_vendor_token_data,
     mock_vendor_data,
     approved_vendor_profile_inject,
+    roles_data_inject,
 ):
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
 
@@ -151,6 +157,7 @@ def test_create_product_sustainability_attributes_validation_error(
     mock_vendor_token_data,
     mock_vendor_data,
     approved_vendor_profile_inject,
+    roles_data_inject,
 ):
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
 
@@ -173,6 +180,7 @@ def test_create_product_stock_validation_error(
     mock_vendor_token_data,
     mock_vendor_data,
     approved_vendor_profile_inject,
+    roles_data_inject,
 ):
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
 
@@ -195,6 +203,7 @@ def test_create_product_order_quantity_validation_error(
     mock_vendor_token_data,
     mock_vendor_data,
     approved_vendor_profile_inject,
+    roles_data_inject,
 ):
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
 
@@ -214,7 +223,13 @@ def test_create_product_order_quantity_validation_error(
 # ---------------------------------------------------------------------------- Get product Tests ----------------------------------------------------------------------------
 
 
-def test_get_all_product(client, products_data_inject):
+def test_get_all_product(
+    client,
+    products_data_inject,
+    approved_vendor_profile_inject,
+    roles_data_inject,
+    users_data_inject,
+):
     product = client.get("/products")
 
     assert product.status_code == 200
@@ -228,9 +243,11 @@ def test_get_product_with_args(
     mock_vendor_token_data,
     mock_vendor_data,
     approved_vendor_profile_inject,
+    roles_data_inject,
 ):
     # register vendor
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
+
     assert register_vendor.status_code == 201
 
     # insert product
@@ -250,7 +267,7 @@ def test_get_product_with_args(
     assert product.json["pagination"]["total"] == 1
 
 
-def test_get_product_invalid_args(client):
+def test_get_product_invalid_args(client, roles_data_inject):
     product = client.get("/products?min_price=-1")
 
     assert product.status_code == 400
@@ -267,13 +284,21 @@ def test_get_product_invalid_args(client):
 # ---------------------------------------------------------------------------- Get product details Tests ----------------------------------------------------------------------------
 
 
-def test_get_product_details(client, products_data_inject):
+def test_get_product_details(client, products_data_inject, roles_data_inject):
     product = client.get("/products/1")
 
     assert product.status_code == 200
     assert product.json["success"] is True
     assert product.json["product"]["id"] == 1
-    assert len(product.json["product"]) == 14
+    assert len(product.json["product"]) == 15
+
+
+def test_get_product_details_repo_error(client, roles_data_inject):
+    product = client.get("/products/1")
+
+    assert product.status_code == 500
+    assert product.json["success"] is False
+    assert product.json["location"] == "view get product detail repo"
 
 
 # ---------------------------------------------------------------------------- Update product details Tests ----------------------------------------------------------------------------
@@ -287,6 +312,7 @@ def test_update_product_details(
     db,
     products_data_inject,
     approved_vendor_profile_inject,
+    roles_data_inject,
 ):
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
 
@@ -317,6 +343,7 @@ def test_update_product_name_validation_error(
     mock_vendor_token_data,
     mock_vendor_data,
     approved_vendor_profile_inject,
+    roles_data_inject,
 ):
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
 
@@ -339,6 +366,7 @@ def test_update_product_description_validation_error(
     mock_vendor_token_data,
     mock_vendor_data,
     approved_vendor_profile_inject,
+    roles_data_inject,
 ):
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
 
@@ -361,6 +389,7 @@ def test_update_product_price_validation_error(
     mock_vendor_token_data,
     mock_vendor_data,
     approved_vendor_profile_inject,
+    roles_data_inject,
 ):
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
 
@@ -383,6 +412,7 @@ def test_update_product_tags_validation_error(
     mock_vendor_token_data,
     mock_vendor_data,
     approved_vendor_profile_inject,
+    roles_data_inject,
 ):
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
 
@@ -405,6 +435,7 @@ def test_update_product_sustainability_attributes_validation_error(
     mock_vendor_token_data,
     mock_vendor_data,
     approved_vendor_profile_inject,
+    roles_data_inject,
 ):
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
 
@@ -427,6 +458,7 @@ def test_update_product_stock_validation_error(
     mock_vendor_token_data,
     mock_vendor_data,
     approved_vendor_profile_inject,
+    roles_data_inject,
 ):
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
 
@@ -449,6 +481,7 @@ def test_update_product_order_quantity_validation_error(
     mock_vendor_token_data,
     mock_vendor_data,
     approved_vendor_profile_inject,
+    roles_data_inject,
 ):
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
 
@@ -471,6 +504,7 @@ def test_update_product_not_vendor(
     mock_vendor_token_data,
     mock_vendor_data,
     approved_vendor_profile_inject,
+    roles_data_inject,
 ):
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
 
@@ -494,6 +528,7 @@ def test_delete_product(
     mock_vendor_data,
     products_data_inject,
     approved_vendor_profile_inject,
+    roles_data_inject,
 ):
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
 
@@ -512,8 +547,9 @@ def test_delete_product_not_vendor(
     client,
     mock_vendor_token_data,
     mock_vendor_data,
-    products_data_inject,
+    products_data_different_vendors_inject,
     approved_vendor_profile_inject,
+    roles_data_inject,
 ):
     register_vendor = client.post("/auth/register", json=mock_vendor_data)
 
@@ -529,23 +565,52 @@ def test_delete_product_not_vendor(
 # ----------------------------------------------------------------------------  Get category test ----------------------------------------------------------------------------
 
 
-def test_get_category(client, category_data_inject):
+def test_get_category(client, category_data_inject, roles_data_inject):
     category = client.get("/products/category")
 
     assert category.status_code == 200
     assert category.json["success"] is True
 
 
-def test_get_category_by_id(client, category_data_inject):
+def test_get_category_by_id(client, category_data_inject, roles_data_inject):
     category = client.get("/products/category/1")
 
     assert category.status_code == 200
     assert category.json["success"] is True
 
 
-def test_get_category_by_id_invalid_id(client, category_data_inject):
+def test_get_category_by_id_invalid_id(client, category_data_inject, roles_data_inject):
     category = client.get("/products/category/3")
 
     assert category.status_code == 500
     assert category.json["success"] is False
     assert category.json["location"] == "view get category detail repo"
+
+
+# ----------------------------------------------------------------------------  Create wishlist test ----------------------------------------------------------------------------
+
+
+def test_create_wishlist(
+    client,
+    mock_vendor_token_data,
+    mock_vendor_data,
+    roles_data_inject,
+    products_data_inject,
+):
+    register_vendor = client.post("/auth/register", json=mock_vendor_data)
+
+    assert register_vendor.status_code == 201
+
+    wishlist = client.post("/products/wishlist/1", headers=mock_vendor_token_data)
+
+    assert wishlist.status_code == 200
+    assert wishlist.json["success"] is True
+
+
+# router\product.py             51      8    84%   50-55, 60, 81, 86
+
+# views\product.py             145     60    59%   82-84, 155-157, 216, 278-289, 302-334, 347-381, 394-420, 447-448, 491-514, 527-540
+
+# schemas\product.py           284     41    86%   69, 83, 87, 93-120, 291-312, 316-343, 385, 390, 395, 449, 478, 483
+
+# repo\product.py              105     34    68%   25-31, 44-69, 187-201, 205-211, 215, 222, 252-255, 259-265
