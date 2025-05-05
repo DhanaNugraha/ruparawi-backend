@@ -167,14 +167,14 @@ def category_data_inject(test_app):
     category_data = [
         {
             "id": 1,
-            "name": "updated product",
-            "description": "test product description",
+            "name": "category1",
+            "description": "test category description",
         },
         {
             "id": 2,
-            "name": "updated product",
-            "description": "test product description",
-            "parent_category_id": 1
+            "name": "category2",
+            "description": "test category description",
+            "parent_category_id": 1,
         },
     ]
     with test_app.app_context():
@@ -419,6 +419,28 @@ def promotions_data_inject(test_app):
         _db.session.commit()
 
         return promotions_list
+    
+
+@pytest.fixture
+def article_data_inject(test_app):
+    article_data = [
+        {
+            "id": 1,
+            "title": "article test",
+            "content": "test content ......................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................",
+            "author_id": 1,
+        }
+    ]
+    with test_app.app_context():
+        article_list = []
+        for article in article_data:
+            article_model = models.Article(**article)
+            article_list.append(article_model)
+
+        _db.session.add_all(article_list)
+        _db.session.commit()
+
+        return article_list
 
 
 @pytest.fixture
@@ -639,4 +661,13 @@ def mock_promotion_data():
         "end_date": "2100-12-31",
         "usage_limit": 1,
         "product_ids": [1, 2],
+        "category_names": ["category1", "category2"],
+        "image_url": "https://example.com/promotion.jpg",
+    }
+
+@pytest.fixture
+def mock_article_data():
+    return {
+        "title": "article test",
+        "content": "test content ......................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................",
     }
