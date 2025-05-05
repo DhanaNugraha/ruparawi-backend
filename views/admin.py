@@ -90,7 +90,6 @@ def update_category_view(category_request, category_id):
 
         # check if parent exist
         if category_data_validated.parent_category_id:
-            # test if it returns 404---------------
             check_parent_category_repo(category_data_validated.parent_category_id)
 
         # update category
@@ -591,15 +590,7 @@ def get_article_by_id_view(article_id):
 
 def update_article_view(data, article_id):
     try:
-        article = Article.query.get(article_id)
-        if not article:
-            return jsonify(
-                {
-                    "success": False,
-                    "message": "Article not found",
-                    "location": "view update article validation",
-                }
-            ), 404
+        article = get_article_by_id_repo(article_id)
 
         title = data.get("title")
         content = data.get("content")
@@ -664,15 +655,7 @@ def update_article_view(data, article_id):
 
 def delete_article_view(article_id):
     try:
-        article = Article.query.get(article_id)
-        if not article:
-            return jsonify(
-                {
-                    "success": False,
-                    "message": "Article not found",
-                    "location": "view delete article validation",
-                }
-            ), 404
+        article = get_article_by_id_repo(article_id)
 
         db.session.delete(article)
         db.session.commit()

@@ -98,7 +98,11 @@ def create_article_repo(title, content, author_id):
 
 def get_article_by_id_repo(article_id):
     try:
-        article = Article.query.get(article_id)
+
+        article = db.session.execute(
+            db.select(Article).filter_by(id=article_id)
+        ).scalar_one_or_none()
+ 
         if not article:
             raise Exception(f"Article with ID {article_id} not found.")
         return article
@@ -154,10 +158,6 @@ def add_categories_to_promotion_repo(promotion, category_name_list):
         )
 
         promotion.categories.append(category)
-
-
-def get_promotion_detail_repo(promotion_id):
-    return db.one_or_404(db.select(Promotion).filter_by(id=promotion_id))
 
 
 def list_active_promotions_repo():
