@@ -204,8 +204,7 @@ class Promotion(db.Model, BaseModel):
     categories = db.relationship(
         "ProductCategory",
         secondary="promotion_category_association",
-        backref=db.backref("promotions", lazy="dynamic"),
-        lazy="dynamic",
+        backref="promotions"
     )
 
     admin = db.relationship("User", backref="created_promotions")

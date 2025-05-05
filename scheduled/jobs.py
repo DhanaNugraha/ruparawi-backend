@@ -1,18 +1,21 @@
 import os
 import threading
 import time
+
+from flask_jwt_extended import jwt_required
+from auth.auth import admin_required
 from shared.time import now
 from instance.database import db
 
 def scheduled_job_setup(app):
     def background_worker():
-        """Runs in a loop forever"""
+        # Runs in a loop forever
         while True:
             with app.app_context():
                 try:
                     app.logger.info(f"Starting background task at {now()}")
 
-                    # Example task: Update product ratings
+                    # update product ratings
                     from models.product import Product
 
                     products = Product.query.all()
@@ -39,6 +42,8 @@ def scheduled_job_setup(app):
 
     # Monitoring endpoint
     @app.route("/task-status")
+    @jwt_required()
+    @admin_required()
     def task_status():
         is_alive = any(
             t.name == "BackgroundWorker" and t.is_alive() for t in threading.enumerate()
