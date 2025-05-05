@@ -278,3 +278,18 @@ class UserPaymentMethodResponse(BaseModel):
         from_attributes=True,  # Can read SQLAlchemy model
         extra="ignore",  # ignore extra fields
     )
+
+
+class UserPaymentMethodUnsecuredResponse(BaseModel):
+    id: int
+    user_id: int
+    payment_type: str
+    provider: str
+    account_number: str
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = ConfigDict(
+        from_attributes=True,  # Can read SQLAlchemy model
+        extra="ignore",  # ignore extra fields
+    )

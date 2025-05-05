@@ -11,8 +11,8 @@ class VendorStatus(Enum):
     REJECTED = "rejected"
 
 class PaymentType(Enum):
-    CREDIT_CARD = "credit_card"
-    BANK_TRANSFER = "bank_transfer"
+    CREDIT_CARD = "credit card"
+    DEBIT_CARD = "debit card"
 
 # -------------------------------------- Association --------------------------------------
 

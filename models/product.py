@@ -136,8 +136,6 @@ class Product(db.Model, BaseModel):
             self.review_count = 0
 
 
-
-
 class ProductImage(db.Model, BaseModel):
     __tablename__ = "product_images"
 
