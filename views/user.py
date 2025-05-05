@@ -2,7 +2,7 @@ from flask import jsonify
 from pydantic import ValidationError
 from instance.database import db
 from repo.user import add_address_repo, add_payment_method_repo, delete_address_repo, delete_payment_method_repo, get_all_address_repo, update_address_repo, update_payment_method_repo, update_user_repo, user_by_id_repo
-from schemas.user import PublicUserProfileResponse, UserAddressCreate, UserAddressResponse, UserAddressUpdate, UserPaymentMethodBase, UserPaymentMethodResponse, UserProfileUpdateRequest
+from schemas.user import PublicUserProfileResponse, UserAddressCreate, UserAddressResponse, UserAddressUpdate, UserPaymentMethodBase, UserPaymentMethodResponse, UserPaymentMethodUnsecuredResponse, UserProfileUpdateRequest
 
 
 # ------------------------------------------------------ Get Public User Profile --------------------------------------------------
@@ -266,7 +266,7 @@ def update_payment_method_view(user, payment_method_request, payment_method_id):
         return jsonify(
             {
                 "success": True,
-                "message": UserPaymentMethodResponse.model_validate(
+                "message": UserPaymentMethodUnsecuredResponse.model_validate(
                     payment_updated
                 ).model_dump(),
             }

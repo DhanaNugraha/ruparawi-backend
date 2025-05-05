@@ -1,4 +1,4 @@
-from sqlalchemy import distinct, extract, func
+from sqlalchemy import and_, distinct, extract, func
 from instance.database import db
 from models.order import Order, OrderItem
 from models.product import Product, ProductImage
@@ -166,7 +166,7 @@ def get_vendor_recent_orders_repo(user):
             Order.created_at,
             Order.status,
             Product.name.label("product_name"),
-            ProductImage.image_url.label("image_url"),
+            func.max(ProductImage.image_url).label("image_url"),
             User.username.label("customer_username"),
             OrderItem.quantity,
             OrderItem.total_price,
@@ -174,8 +174,22 @@ def get_vendor_recent_orders_repo(user):
         .join(OrderItem, Order.id == OrderItem.order_id)
         .join(Product, OrderItem.product_id == Product.id)
         .join(User, Order.user_id == User.id)
-        # .join(ProductImage, Product.id == ProductImage.product_id)
-        .filter(OrderItem.vendor_id == user.id, ProductImage.is_primary == True)
+        .outerjoin(
+            ProductImage,
+            and_(
+                ProductImage.product_id == Product.id, ProductImage.is_primary == True
+            ),
+        )
+        .filter(OrderItem.vendor_id == user.id)
+        .group_by(
+            Order.id,
+            Order.created_at,
+            Order.status,
+            Product.name,
+            User.username,
+            OrderItem.quantity,
+            OrderItem.total_price,
+        )
         .order_by(Order.created_at.desc())
         .limit(5)
         .all()
