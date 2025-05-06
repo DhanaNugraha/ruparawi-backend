@@ -1,6 +1,6 @@
 from flask import Blueprint, request
 from flask_jwt_extended import current_user, jwt_required
-from views.order import add_item_to_shopping_cart_view, checkout_order_view, delete_shopping_cart_item_view, get_all_orders_view, get_order_view, get_shopping_cart_view, update_order_status_view, update_shopping_cart_item_view
+from views.order import add_item_to_shopping_cart_view, checkout_order_view, delete_shopping_cart_item_view, get_all_orders_view, get_order_view, get_shopping_cart_view, pre_checkout_order_view, update_order_status_view, update_shopping_cart_item_view
 
 
 order_router = Blueprint("order_router", __name__, url_prefix="/order")
@@ -39,6 +39,10 @@ def delete_shopping_cart_item(product_id):
 def checkout_order():
     return checkout_order_view(current_user, request.json)
 
+@order_router.route("/pre-checkout", methods=["POST"])
+@jwt_required()
+def pre_checkout_order():
+    return pre_checkout_order_view(current_user, request.json)
 
 @order_router.route("/<string:order_number>", methods=["GET"])
 @jwt_required()
