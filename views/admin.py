@@ -26,6 +26,7 @@ from repo.vendor import (
 from schemas.admin import (
     AdminLogsResponse,
     CategoryCreate,
+    CategoryCreateResponse,
     CategoryResponse,
     CategoryUpdate,
     CategoryUpdateResponse,
@@ -55,7 +56,7 @@ def create_category_view(category_request):
             {
                 "success": True,
                 "message": "Category created successfully",
-                "category": CategoryResponse.model_validate(
+                "category": CategoryCreateResponse.model_validate(
                     category_data_validated
                 ).model_dump(),
             }

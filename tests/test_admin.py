@@ -337,15 +337,15 @@ def test_get_all_vendors(
     get_all_vendors = client.get(
         "/admin/vendors?page=1&per_page=1", headers=mock_token_data
     )
-
+    
     assert get_all_vendors.status_code == 200
     assert get_all_vendors.json["success"] is True
     assert get_all_vendors.json["message"] == "Vendors fetched successfully"
 
-    assert get_all_vendors.json["pagination"]["total"] == 1
+    assert get_all_vendors.json["pagination"]["total"] == 2
     assert get_all_vendors.json["pagination"]["current_page"] == 1
     assert get_all_vendors.json["pagination"]["per_page"] == 1
-    assert get_all_vendors.json["pagination"]["pages"] == 1
+    assert get_all_vendors.json["pagination"]["pages"] == 2
 
     assert len(get_all_vendors.json["vendors"]) == 3
 

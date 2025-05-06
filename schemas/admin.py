@@ -24,6 +24,21 @@ class CategoryCreate(BaseModel):
         extra="ignore",  # ignore extra fields
     )
 
+class CategoryCreateResponse(BaseModel):
+    id: Optional[int] = None
+    parent_category_id: Optional[int] = None
+    subcategories: Optional[
+        List["CategoryResponse"]
+    ] = []  # subcategory is a nested class
+    name: str
+    description: Optional[str] = None
+    is_active: Optional[bool] = True
+
+    model_config = ConfigDict(
+        from_attributes=True,  # Can read SQLAlchemy model
+        extra="ignore",  # ignore extra fields
+    )
+
 
 class CategoryResponse(BaseModel):
     id: Optional[int] = None
@@ -37,6 +52,7 @@ class CategoryResponse(BaseModel):
         from_attributes=True,  # Can read SQLAlchemy model
         extra="ignore",  # ignore extra fields
     )
+    
 
 
 class CategoryTreeResponse(BaseModel):

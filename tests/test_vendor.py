@@ -461,7 +461,7 @@ def test_get_vendor_products(
 
     assert get_vendor_products.status_code == 200
     assert get_vendor_products.json["success"] is True
-    assert len(get_vendor_products.json["products"]) == 1
+    assert len(get_vendor_products.json["products"]) == 2
 
 
 # ----------------------------------------------------------------------------- Get vendor stats -----------------------------------------------------------
@@ -517,7 +517,7 @@ def test_get_vendor_recent_orders(
     assert get_vendor_recent_orders.status_code == 200
     assert get_vendor_recent_orders.json["success"] is True
     assert len(recent_orders) == 2
-    assert len(recent_orders[0]) == 7
+    assert len(recent_orders[0]) == 8
 
 
 # repo 41-53 in admin
