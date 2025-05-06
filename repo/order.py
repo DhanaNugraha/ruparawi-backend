@@ -196,8 +196,6 @@ def validate_promotion_repo(promo_code, cart_items):
     # Get eligible product IDs for this promotion
     eligible_product_ids = set()
 
-    print(eligible_product_ids)
-
     # Products directly added to promotion
     if promotion.products:
         eligible_product_ids.update(product.id for product in promotion.products)
@@ -228,6 +226,38 @@ def validate_promotion_repo(promo_code, cart_items):
     }
 
 
+def pre_checkout_promotion_calculation(cart_items, promotion, eligible_item_ids, total_amount):
+    # convert to list
+    eligible_order_items = [
+        item for item in cart_items if item.product_id in eligible_item_ids
+    ]
+
+    if not eligible_order_items:
+        return 0.0
+
+    # Calculate discount
+    if promotion.promotion_type == "percentage_discount":
+        subtotal = sum((item.product.price * item.quantity) for item in eligible_order_items)
+
+        # discount will be less than or equal to max_discount
+        discount = min(
+            subtotal * (promotion.discount_value / 100),
+            promotion.max_discount
+            or float("inf")  # Handle case where max_discount is None
+        )
+
+    elif promotion.promotion_type == "fixed_discount":
+        discount = promotion.discount_value * len(eligible_order_items)
+
+    else:
+        discount = 0.0
+
+    # Apply discount, prevent negatives
+    total_amount = max(total_amount - discount, 0)
+
+    return (total_amount, discount)
+
+
 def apply_promotion_to_order_repo(order, promotion, eligible_item_ids):
     # convert to list
     eligible_order_items = [
@@ -245,9 +275,8 @@ def apply_promotion_to_order_repo(order, promotion, eligible_item_ids):
         discount = min(
             subtotal * (promotion.discount_value / 100),
             promotion.max_discount
-            or float("inf")  # Handle case where max_discount is None
+            or float("inf"),  # Handle case where max_discount is None
         )
-
 
     elif promotion.promotion_type == "fixed_discount":
         discount = promotion.discount_value * len(eligible_order_items)
@@ -270,7 +299,7 @@ def apply_promotion_to_order_repo(order, promotion, eligible_item_ids):
 
     db.session.flush()
 
-    return (order, discount) 
+    return (order, discount)
 
 
 def get_promotions_repo(order_id):
