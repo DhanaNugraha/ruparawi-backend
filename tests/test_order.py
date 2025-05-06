@@ -1,12 +1,12 @@
 
 # uv run pytest -v -s --cov=.
-# uv run pytest tests/test_order.py -v -s --cov=.
+# uv run pytest tests/test_order.py -v -s --cov=. --cov-report term-missing
 
 # change test for out of stock to the new one for both inactive and out of stock
 
 # ---------------------------------------------------------------------------- Get cart test ----------------------------------------------------------------------------
 
-def test_get_cart(client, mock_user_data, mock_token_data):
+def test_get_cart(client, mock_user_data, mock_token_data, roles_data_inject):
     register_user = client.post("/auth/register", json=mock_user_data)
 
     assert register_user.status_code == 201
@@ -21,7 +21,14 @@ def test_get_cart(client, mock_user_data, mock_token_data):
 # ---------------------------------------------------------------------------- Add to cart test ----------------------------------------------------------------------------
 
 
-def test_add_to_cart(client, mock_user_data, mock_token_data ,mock_add_cart_item, products_data_inject):
+def test_add_to_cart(
+    client,
+    mock_user_data,
+    mock_token_data,
+    mock_add_cart_item,
+    products_data_inject,
+    roles_data_inject,
+):
     register_user = client.post("/auth/register", json=mock_user_data)
 
     assert register_user.status_code == 201
@@ -35,7 +42,9 @@ def test_add_to_cart(client, mock_user_data, mock_token_data ,mock_add_cart_item
     assert add_to_cart.json["cart_item"]["quantity"] == 1
 
 
-def test_add_to_cart_product_id_validation_error(client, mock_user_data, mock_token_data, mock_add_cart_item):
+def test_add_to_cart_product_id_validation_error(
+    client, mock_user_data, mock_token_data, mock_add_cart_item, roles_data_inject
+):
     register_user = client.post("/auth/register", json=mock_user_data)
 
     assert register_user.status_code == 201
@@ -50,7 +59,7 @@ def test_add_to_cart_product_id_validation_error(client, mock_user_data, mock_to
 
 
 def test_add_to_cart_quantity_validation_error(
-    client, mock_user_data, mock_token_data, mock_add_cart_item
+    client, mock_user_data, mock_token_data, mock_add_cart_item, roles_data_inject
 ):
     register_user = client.post("/auth/register", json=mock_user_data)
 
@@ -68,7 +77,12 @@ def test_add_to_cart_quantity_validation_error(
 
 
 def test_add_to_cart_out_of_stock(
-    client, mock_user_data, mock_token_data, mock_add_cart_item, products_data_inject
+    client,
+    mock_user_data,
+    mock_token_data,
+    mock_add_cart_item,
+    products_data_inject,
+    roles_data_inject,
 ):
     register_user = client.post("/auth/register", json=mock_user_data)
 
@@ -86,7 +100,12 @@ def test_add_to_cart_out_of_stock(
 
 
 def test_add_to_cart_repo_error(
-    client, mock_user_data, mock_token_data, mock_add_cart_item, products_data_inject
+    client,
+    mock_user_data,
+    mock_token_data,
+    mock_add_cart_item,
+    products_data_inject,
+    roles_data_inject,
 ):
     register_user = client.post("/auth/register", json=mock_user_data)
 
@@ -107,7 +126,13 @@ def test_add_to_cart_repo_error(
 
 
 def test_update_cart_item(
-    client, mock_user_data, mock_token_data, mock_update_cart_item, products_data_inject, cart_item_data_inject
+    client,
+    mock_user_data,
+    mock_token_data,
+    mock_update_cart_item,
+    products_data_inject,
+    cart_item_data_inject,
+    roles_data_inject,
 ):
     register_user = client.post("/auth/register", json=mock_user_data)
 
@@ -125,10 +150,7 @@ def test_update_cart_item(
 
 
 def test_update_cart_item_quantity_validation_error(
-    client,
-    mock_user_data,
-    mock_token_data,
-    mock_update_cart_item,
+    client, mock_user_data, mock_token_data, mock_update_cart_item, roles_data_inject
 ):
     register_user = client.post("/auth/register", json=mock_user_data)
 
@@ -154,6 +176,7 @@ def test_update_cart_item_out_of_stock(
     mock_update_cart_item,
     products_data_inject,
     cart_item_data_inject,
+    roles_data_inject,
 ):
     register_user = client.post("/auth/register", json=mock_user_data)
 
@@ -171,10 +194,7 @@ def test_update_cart_item_out_of_stock(
 
 
 def test_update_cart_repo_error(
-    client,
-    mock_user_data,
-    mock_token_data,
-    mock_update_cart_item,
+    client, mock_user_data, mock_token_data, mock_update_cart_item, roles_data_inject
 ):
     register_user = client.post("/auth/register", json=mock_user_data)
 
@@ -194,7 +214,14 @@ def test_update_cart_repo_error(
 # ---------------------------------------------------------------------------- delete cart item test ----------------------------------------------------------------------------
 
 
-def test_delete_cart_item(client, mock_user_data, mock_token_data, products_data_inject, cart_item_data_inject):
+def test_delete_cart_item(
+    client,
+    mock_user_data,
+    mock_token_data,
+    products_data_inject,
+    cart_item_data_inject,
+    roles_data_inject,
+):
     register_user = client.post("/auth/register", json=mock_user_data)
 
     assert register_user.status_code == 201
@@ -206,7 +233,9 @@ def test_delete_cart_item(client, mock_user_data, mock_token_data, products_data
     assert delete_cart_item.json["message"] == "Cart item deleted successfully"
 
 
-def test_delete_cart_repo_error(client, mock_user_data, mock_token_data):
+def test_delete_cart_repo_error(
+    client, mock_user_data, mock_token_data, roles_data_inject
+):
     register_user = client.post("/auth/register", json=mock_user_data)
 
     assert register_user.status_code == 201
