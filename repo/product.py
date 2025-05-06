@@ -22,7 +22,6 @@ def create_product_repo(product_data, user_id):
 
 def process_product_images_repo(primary_image, images_list, product_id):
     for image_url in images_list:
-        print("image_url", image_url)
         product_image = ProductImage(
             product_id=product_id,
             image_url=image_url,
@@ -54,8 +53,8 @@ def update_product_image_repo(product, primary_image, images_list):
         # delete non-primary images
         db.session.execute(
         db.delete(ProductImage).where(
-            ProductImage.product_id == product.id  # noqa: E712
-            & ProductImage.is_primary == False
+            ProductImage.product_id == product.id,  # noqa: E712
+            ProductImage.is_primary == False  # noqa: E712
             )
         )
 
@@ -67,6 +66,7 @@ def update_product_image_repo(product, primary_image, images_list):
             )
 
             db.session.add(product_image)
+
 
 
 def process_tags_repo(tags_list, product): 

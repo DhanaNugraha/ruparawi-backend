@@ -177,7 +177,7 @@ def get_vendor_recent_orders_repo(user):
         .outerjoin(
             ProductImage,
             and_(
-                ProductImage.product_id == Product.id, ProductImage.is_primary == True
+                ProductImage.product_id == Product.id, ProductImage.is_primary == True  # noqa: E712
             ),
         )
         .filter(OrderItem.vendor_id == user.id)
