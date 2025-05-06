@@ -272,15 +272,6 @@ def soft_delete_product_view(user, product_id):
             }
         ), 200
 
-    except ValidationError as e:
-        return jsonify(
-            {
-                "message": str(e),
-                "success": False,
-                "location": "view delete product request validation",
-            }
-        ), 400
-
     except Exception as e:
         db.session.rollback()
         return jsonify(
@@ -299,7 +290,7 @@ def add_product_to_wishlist_view(user, product_id):
     try:
         # get product
         product = get_product_detail_repo(product_id)
-
+        
         wishlist = add_product_to_wishlist_by_user_id_repo(user.id, product)
 
         if wishlist is None:
@@ -316,15 +307,6 @@ def add_product_to_wishlist_view(user, product_id):
                 "success": True,
             }
         ), 200
-
-    except ValidationError as e:
-        return jsonify(
-            {
-                "message": str(e),
-                "success": False,
-                "location": "view add product to wishlist request validation",
-            }
-        ), 400
 
     except Exception as e:
         db.session.rollback()
@@ -363,15 +345,6 @@ def remove_product_from_wishlist_view(user, product_id):
                 "success": True,
             }
         ), 200
-
-    except ValidationError as e:
-        return jsonify(
-            {
-                "message": str(e),
-                "success": False,
-                "location": "view remove product from wishlist request validation",
-            }
-        ), 400
 
     except Exception as e:
         db.session.rollback()

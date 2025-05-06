@@ -19,7 +19,7 @@ class ProductCreateRequest(BaseModel):
     stock_quantity: int
     min_order_quantity: int = 1
     primary_image_url: str 
-    images: List[str] = []
+    images: List[str] | None = []
 
     @field_validator("name")
     def validate_name(cls, value):
@@ -65,9 +65,6 @@ class ProductCreateRequest(BaseModel):
     
     @field_validator("primary_image_url")
     def validate_primary_image_url(cls, value):
-        if not value:
-            return value
-
         # Basic URL regex pattern
         url_pattern = re.compile(
             r"^(https?://)"  # http:// or https://
@@ -91,7 +88,7 @@ class ProductCreateRequest(BaseModel):
     @field_validator("images")
     def validate_images(cls, value):
         if not value:
-            return value
+            return []
         
         if value and len(value) > 4:
             raise ValueError("Maximum of 10 images allowed")
