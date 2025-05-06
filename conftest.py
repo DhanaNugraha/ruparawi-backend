@@ -496,6 +496,34 @@ def article_data_inject(test_app):
         _db.session.commit()
 
         return article_list
+    
+
+@pytest.fixture
+def image_data_inject(test_app):
+    image_data = [
+        {
+            "id": 1,
+            "product_id": 1,
+            "image_url": "https://example.com/image1.jpg",
+            "is_primary": True,
+        },
+        {
+            "id": 2,
+            "product_id": 1,
+            "image_url": "https://example.com/image2.jpg",
+            "is_primary": False,
+        },
+    ]
+    with test_app.app_context():
+        image_list = []
+        for image in image_data:
+            image_model = models.ProductImage(**image)
+            image_list.append(image_model)
+
+        _db.session.add_all(image_list)
+        _db.session.commit()
+
+        return image_list
 
 
 @pytest.fixture
@@ -561,6 +589,7 @@ def mock_create_product_data():
         "stock_quantity": 100,
         "min_order_quantity": 2,
         "primary_image_url": "https://example.com/image.jpg",
+        "images": ["https://example.com/image2.jpg"],
     }
 
 @pytest.fixture
@@ -601,7 +630,9 @@ def mock_update_product_data():
         "sustainability_attributes": ["organic", "carbon-neutral"],
         "stock_quantity": 100,
         "min_order_quantity": 2,
-        "is_active": True
+        "is_active": True,
+        "primary_image_url": "https://example.com/image.jpg",
+        "images": ["https://example.com/image2.jpg"],
     }
 
 
@@ -689,20 +720,20 @@ def mock_update_address_data():
 @pytest.fixture
 def mock_create_payment_method_data():
     return {
-        "payment_type": "credit_card",
+        "payment_type": "credit card",
         "provider": "Visa",
         "account_number": "4111111111111111",
-        "expiry_date": "2025-12-31",
+        "expiry_date": "12/25",
         "is_default": True,
     }
 
 @pytest.fixture
 def mock_update_payment_method_data():
     return {
-        "payment_type": "credit_card",
+        "payment_type": "credit card",
         "provider": "Visa",
         "account_number": "4111111111111111",
-        "expiry_date": "2040-12-31",
+        "expiry_date": "12/40",
         "is_default": True,
     }
 

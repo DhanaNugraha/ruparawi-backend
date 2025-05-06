@@ -1,4 +1,3 @@
-from datetime import timezone
 from instance.database import db
 from models.product import Product, ProductCategory, Promotion
 from models.user import AdminLog, User

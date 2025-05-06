@@ -167,12 +167,7 @@ class Wishlist(db.Model, BaseModel):
         return False
 
     def has_product(self, product):
-        return (
-            self.products.filter(
-                wishlist_association.c.product_id == product.id
-            ).count()
-            > 0
-        )
+        return product in self.products
 
 
 # ------------------------------------------------------- Promotions
