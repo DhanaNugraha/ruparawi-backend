@@ -31,6 +31,7 @@ class CategoryResponse(BaseModel):
     subcategories: Optional[List["CategoryResponse"]] = [] #subcategory is a nested class
     name: str
     description: Optional[str] = None
+    is_active: bool
 
     model_config = ConfigDict(
         from_attributes=True,  # Can read SQLAlchemy model
