@@ -425,7 +425,7 @@ class PromotionListResponse(BaseModel):
     end_date: datetime
     promo_code: str
     image_url: Optional[str]
-    usage_limit: int
+    usage_limit: Optional[int] = None
     products: List[object] | str = []
     max_discount: Optional[float]
     discount_value: float
