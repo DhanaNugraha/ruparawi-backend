@@ -1,5 +1,6 @@
 from instance.database import db
 from models.product import Product, ProductCategory, ProductImage, SustainabilityAttribute, ProductTag, Wishlist
+from models.user import VendorProfile
 
 
 
@@ -254,4 +255,21 @@ def verify_product_repo(product, requested_quantity):
         return ("Product is inactive", False)
 
     return ("", True)
+
+
+# ----------------------------------------------------------- Public Vendor Products -----------------------------------------------------------
+
+
+def get_public_vendor_products_repo(params):
+    return (
+        db.session.execute(
+            db.select(Product).filter_by(is_active=True)
+            .join(ProductCategory, Product.category_id == ProductCategory.id)
+            .join(VendorProfile, Product.vendor_id == VendorProfile.user_id)
+            .filter(
+                ProductCategory.name == params.category_name,
+                VendorProfile.business_name == params.business_name
+            )
+        ).scalars()
+    )
 

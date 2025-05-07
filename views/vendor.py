@@ -63,13 +63,7 @@ def get_vendor_profile_view(user):
         ), 200
 
     except Exception as e:
-        return jsonify(
-            {
-                "message": str(e),
-                "success": False,
-                "location": "view get vendor profile repo",
-            }
-        ), 500
+        return jsonify({"message": str(e), "success": False, "location": "view get vendor profile repo",}), 500
     
 
 # -------------------------------------------------------------- Update vendor profile ---------------------------------------------------------------------------
@@ -104,13 +98,7 @@ def update_vendor_profile_view(user, vendor_request):
 
     except Exception as e:
         db.session.rollback()
-        return jsonify(
-            {
-                "message": str(e),
-                "success": False,
-                "location": "view update vendor profile repo",
-            }
-        ), 500
+        return jsonify({"message": str(e), "success": False, "location": "view update vendor profile repo",}), 500
 
 
 # -------------------------------------------------------------- Get vendor products ---------------------------------------------------------------------------
@@ -139,13 +127,7 @@ def get_vendor_products_view(user):
         ), 200
 
     except Exception as e:
-        return jsonify(
-            {
-                "message": str(e),
-                "success": False,
-                "location": "view get vendor products repo",
-            }
-        ), 500
+        return jsonify({ "message": str(e), "success": False, "location": "view get vendor products repo",}), 500
 
 
 # -------------------------------------------------------------- Get vendor stats ---------------------------------------------------------------------------
@@ -163,13 +145,7 @@ def get_vendor_stats_view(user):
         ), 200
 
     except Exception as e:
-        return jsonify(
-            {
-                "message": str(e),
-                "success": False,
-                "location": "view get vendor stats repo",
-            }
-        ), 500
+        return jsonify({ "message": str(e), "success": False, "location": "view get vendor stats repo",}), 500
     
 
 # -------------------------------------------------------------- Get vendor recent orders ---------------------------------------------------------------------------
@@ -200,10 +176,4 @@ def get_vendor_recent_orders_view(user):
         ), 200
 
     except Exception as e:
-        return jsonify(
-            {
-                "message": str(e),
-                "success": False,
-                "location": "view get vendor recent orders repo",
-            }
-        ), 500
+        return jsonify({"message": str(e), "success": False, "location": "view get vendor recent orders repo",}), 500

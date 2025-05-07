@@ -1,7 +1,7 @@
 from flask import Blueprint, request
 from flask_jwt_extended import current_user, jwt_required
 from auth.auth import vendor_required
-from views.product import add_product_to_wishlist_view, create_product_view, get_category_detail_view, get_category_tree_view, get_product_detail_view, get_promotion_detail_view, get_promotions_view, get_wishlist_view, list_products_view, remove_product_from_wishlist_view, soft_delete_product_view, update_product_view
+from views.product import add_product_to_wishlist_view, create_product_view, get_category_detail_view, get_category_tree_view, get_product_detail_view, get_promotion_detail_view, get_promotions_view, get_public_vendor_products_view, get_wishlist_view, list_products_view, remove_product_from_wishlist_view, soft_delete_product_view, update_product_view
 
 
 products_router = Blueprint("products_router", __name__, url_prefix="/products")
@@ -85,4 +85,10 @@ def get_promotions():
 def get_promotion_detail(promotion_id):
     return get_promotion_detail_view(promotion_id)
 
-    
+
+# ------------------ Public Vendor Products ------------------
+
+
+@products_router.route("/public-vendor-products", methods=["GET"])
+def public_vendor_products():
+    return get_public_vendor_products_view(request.args)
