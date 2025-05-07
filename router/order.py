@@ -39,10 +39,12 @@ def delete_shopping_cart_item(product_id):
 def checkout_order():
     return checkout_order_view(current_user, request.json)
 
+
 @order_router.route("/pre-checkout", methods=["POST"])
 @jwt_required()
 def pre_checkout_order():
     return pre_checkout_order_view(current_user, request.json)
+
 
 @order_router.route("/<string:order_number>", methods=["GET"])
 @jwt_required()
@@ -54,6 +56,7 @@ def get_order(order_number):
 @jwt_required()
 def update_order_status(order_number):
     return update_order_status_view(current_user, request.json, order_number)
+
 
 @order_router.route("", methods=["GET"])
 @jwt_required()
