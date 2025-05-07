@@ -149,7 +149,7 @@ def get_order_repo(user, order_number):
             joinedload(Order.items).joinedload(OrderItem.product),
             joinedload(Order.status_history),
         )
-        .where(Order.order_number == order_number, Order.user_id == user.id)
+        .where(Order.order_number == order_number)
     ).scalars().first()
 
 
