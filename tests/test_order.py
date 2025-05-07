@@ -1,4 +1,3 @@
-from instance.database import db
 from models.order import CartItem
 from models.product import Product, Promotion
 # uv run pytest -v -s --cov=.
@@ -544,6 +543,7 @@ def test_checkout_order_not_enough_stock(
     category_data_inject,
     admins_data_inject,
     roles_data_inject,
+    db,
 ):
     register_user = client.post("/auth/register", json=mock_user_data)
 
@@ -586,6 +586,7 @@ def test_checkout_order_product_inactive(
     category_data_inject,
     admins_data_inject,
     roles_data_inject,
+    db
 ):
     register_user = client.post("/auth/register", json=mock_user_data)
 
@@ -628,6 +629,7 @@ def test_checkout_order_usage_limit_reached(
     category_data_inject,
     admins_data_inject,
     roles_data_inject,
+    db
 ):
     register_user = client.post("/auth/register", json=mock_user_data)
 

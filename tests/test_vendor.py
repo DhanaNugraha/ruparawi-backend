@@ -517,7 +517,7 @@ def test_get_vendor_recent_orders(
     assert get_vendor_recent_orders.status_code == 200
     assert get_vendor_recent_orders.json["success"] is True
     assert len(recent_orders) == 2
-    assert len(recent_orders[0]) == 8
+    assert len(recent_orders[0]) == 9
 
 
 # repo 41-53 in admin
