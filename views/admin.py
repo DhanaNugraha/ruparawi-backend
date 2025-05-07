@@ -27,7 +27,6 @@ from schemas.admin import (
     AdminLogsResponse,
     CategoryCreate,
     CategoryCreateResponse,
-    CategoryResponse,
     CategoryUpdate,
     CategoryUpdateResponse,
     VendorApprovalRequest,

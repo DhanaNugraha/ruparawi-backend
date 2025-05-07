@@ -170,6 +170,7 @@ def get_vendor_recent_orders_repo(user):
             User.username.label("customer_username"),
             OrderItem.quantity,
             OrderItem.total_price,
+            Order.order_number,
         )
         .join(OrderItem, Order.id == OrderItem.order_id)
         .join(Product, OrderItem.product_id == Product.id)

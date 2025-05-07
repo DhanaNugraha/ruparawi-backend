@@ -192,6 +192,7 @@ def get_vendor_recent_orders_view(user):
                         "order_date": order.created_at,
                         "order_status": order.status,
                         "image_url": order.image_url,
+                        "order_number": order.order_number,
                     }
                     for order in recent_orders
                 ],
