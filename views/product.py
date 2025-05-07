@@ -8,6 +8,7 @@ from repo.product import (
     get_category_by_id_repo,
     get_product_detail_repo,
     get_products_list_repo,
+    get_public_vendor_products_repo,
     get_top_level_categories_repo,
     get_wishlist_by_user_id_repo,
     process_product_images_repo,
@@ -29,6 +30,8 @@ from schemas.product import (
     ProductUpdateRequest,
     PromotionDetailResponse,
     PromotionListResponse,
+    PublicVendorProductsParams,
+    VendorProductsResponse,
     WishlistProductResponse,
 )
 
@@ -514,5 +517,39 @@ def get_promotion_detail_view(promotion_id):
                 "message": str(e),
                 "success": False,
                 "location": "view get promotion detail repo",
+            }
+        ), 500
+    
+
+# ------------------------------------------------------ Get public vendor products --------------------------------------------------
+
+
+def get_public_vendor_products_view(params):
+    try:
+        params_data_validated = PublicVendorProductsParams.model_validate(
+            params.to_dict(flat=True)
+        )
+
+        products = get_public_vendor_products_repo(params_data_validated)
+
+        products_response = [
+            VendorProductsResponse.model_validate(product).model_dump()
+            for product in products
+        ]
+
+        return jsonify(
+            {
+                "success": True,
+                "products": products_response,
+            }
+        ), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify(
+            {
+                "message": str(e),
+                "success": False,
+                "location": "view get public vendor products repo",
             }
         ), 500
