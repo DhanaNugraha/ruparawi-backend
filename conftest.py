@@ -6,6 +6,7 @@ import models
 from shared.time import datetime_from_string, now
 import os
 
+
 @pytest.fixture
 def test_app():
     config_module = os.environ["FLASK_CONFIG"] = "config.testing"
@@ -27,6 +28,7 @@ def test_app():
 def db(test_app):
     with test_app.app_context():
         yield _db
+
 
 @pytest.fixture
 def client(test_app):
@@ -65,7 +67,7 @@ def users_data_inject(test_app):
         _db.session.commit()
 
         return users_list
-    
+
 
 @pytest.fixture
 def roles_data_inject(test_app):
@@ -134,7 +136,7 @@ def products_data_inject(test_app):
         for product in products_data:
             product_model = models.Product(**product)
             products_list.append(product_model)
-        
+
         _db.session.add_all(products_list)
         _db.session.commit()
 
@@ -205,7 +207,7 @@ def admins_data_inject(test_app):
         _db.session.commit()
 
         return admins_list
-    
+
 
 @pytest.fixture
 def category_data_inject(test_app):
@@ -232,7 +234,7 @@ def category_data_inject(test_app):
         _db.session.commit()
 
         return category_list
-    
+
 
 @pytest.fixture
 def approved_vendor_profile_inject(test_app):
@@ -268,7 +270,7 @@ def approved_vendor_profile_inject(test_app):
         _db.session.commit()
 
         return vendor_profile_list
-    
+
 
 @pytest.fixture
 def pending_vendor_profile_inject(test_app):
@@ -294,7 +296,27 @@ def pending_vendor_profile_inject(test_app):
         _db.session.commit()
 
         return vendor_profile_list
-    
+
+
+@pytest.fixture
+def cart_data_inject(test_app):
+    cart_data = [
+        {
+            "id": 1,
+            "user_id": 1,
+        },
+    ]
+    with test_app.app_context():
+        cart_list = []
+        for cart in cart_data:
+            cart_model = models.ShoppingCart(**cart)
+            cart_list.append(cart_model)
+
+        _db.session.add_all(cart_list)
+        _db.session.commit()
+
+        return cart_list
+
 
 @pytest.fixture
 def cart_item_data_inject(test_app):
@@ -316,7 +338,7 @@ def cart_item_data_inject(test_app):
         _db.session.commit()
 
         return cart_item_list
-    
+
 
 @pytest.fixture
 def address_data_inject(test_app):
@@ -343,7 +365,7 @@ def address_data_inject(test_app):
         _db.session.commit()
 
         return address_list
-    
+
 
 @pytest.fixture
 def payment_method_data_inject(test_app):
@@ -367,7 +389,7 @@ def payment_method_data_inject(test_app):
         _db.session.commit()
 
         return payment_method_list
-    
+
 
 @pytest.fixture
 def order_data_inject(test_app):
@@ -396,7 +418,7 @@ def order_data_inject(test_app):
         _db.session.commit()
 
         return order_list
-    
+
 
 @pytest.fixture
 def order_item_data_inject(test_app):
@@ -430,7 +452,7 @@ def order_item_data_inject(test_app):
         _db.session.commit()
 
         return order_item_list
-    
+
 
 @pytest.fixture
 def promotions_data_inject(test_app):
@@ -474,7 +496,7 @@ def promotions_data_inject(test_app):
         _db.session.commit()
 
         return promotions_list
-    
+
 
 @pytest.fixture
 def article_data_inject(test_app):
@@ -496,7 +518,7 @@ def article_data_inject(test_app):
         _db.session.commit()
 
         return article_list
-    
+
 
 @pytest.fixture
 def image_data_inject(test_app):
@@ -527,12 +549,30 @@ def image_data_inject(test_app):
 
 
 @pytest.fixture
+def product_review_data_inject(test_app):
+    product_review_data = [
+        {"id": 1, "product_id": 1, "user_id": 1, "rating": 5, "comment": "test inject"},
+    ]
+    with test_app.app_context():
+        product_review_list = []
+        for product_review in product_review_data:
+            product_review_model = models.ProductReview(**product_review)
+            product_review_list.append(product_review_model)
+
+        _db.session.add_all(product_review_list)
+        _db.session.commit()
+
+        return product_review_list
+
+
+@pytest.fixture
 def mock_user_data():
     return {
         "username": "eco_buyer",
         "email": "buyer@example.com",
         "password": "sustainable123",
     }
+
 
 @pytest.fixture
 def mock_login_data():
@@ -541,17 +581,20 @@ def mock_login_data():
         "password": "sustainable123",
     }
 
+
 @pytest.fixture
 def mock_token_data():
     return {
         "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0NDgxMjcxNSwianRpIjoiYTg1NDlkZjctYjJlNS00MWVkLWJlNzktMWY0NmNjMzZiNDk4IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3NDQ4MTI3MTUsImNzcmYiOiJiOWNkN2E4NC04YjUyLTQ5ZWEtYjY2ZC1jNTU3ZDQ1MzUzYzEiLCJ1c2VybmFtZSI6ImVjb19idXllciIsImVtYWlsIjoiYnV5ZXJAZXhhbXBsZS5jb20iLCJpc192ZW5kb3IiOmZhbHNlLCJpc19hZG1pbiI6ZmFsc2V9.4c1EcKMgb__oQLqBjptFxjl9_up9hbPXzNuguQZRGQQ"
     }
 
+
 @pytest.fixture
 def mock_refresh_token_data():
     return {
         "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0NjI2NDA1NCwianRpIjoiZDAwZjVjZDgtNmEyMy00ZGFlLWI2ZTYtYjViYjczNmQwN2I1IiwidHlwZSI6InJlZnJlc2giLCJzdWIiOiIxIiwibmJmIjoxNzQ2MjY0MDU0LCJjc3JmIjoiMDMzM2ZiMzgtOTkxNy00MWQzLTg3YzEtYTIzYjAxNjhiN2UxIiwiZXhwIjoxNzQ4ODU2MDU0LCJ1c2VybmFtZSI6ImVjb19idXllciIsImVtYWlsIjoiYnV5ZXJAZXhhbXBsZS5jb20ifQ.DRtVTPOH9Vw2H1RCTZJb7zPMJT3O5JJ_xjr2UOEKPD0"
     }
+
 
 @pytest.fixture
 def mock_update_user_data():
@@ -562,6 +605,7 @@ def mock_update_user_data():
         "profile_image_url": "https://example.com/profile.jpg",
         "password": "updated123",
     }
+
 
 @pytest.fixture
 def mock_vendor_data():
@@ -578,6 +622,7 @@ def mock_vendor_token_data():
         "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0NDkwMzY4MCwianRpIjoiODczZjM4OTMtMWRjYy00YTRmLThlNTYtYWEzYWFhNTA4N2M1IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3NDQ5MDM2ODAsImNzcmYiOiJhMzU4YTczOS1lOTA3LTQ4YzItOTI3YS00ZGM4MmRmNjhkMjIiLCJ1c2VybmFtZSI6ImVjb19zZWxsZXIiLCJlbWFpbCI6InNlbGxlckBleGFtcGxlLmNvbSIsImlzX3ZlbmRvciI6dHJ1ZSwiaXNfYWRtaW4iOmZhbHNlfQ.wxF4C495DnFjDn3Vq4K7g1VSnCT9Xci8BblYi7ALIkY"
     }
 
+
 @pytest.fixture
 def mock_create_product_data():
     return {
@@ -591,6 +636,7 @@ def mock_create_product_data():
         "primary_image_url": "https://example.com/image.jpg",
         "images": ["https://example.com/image2.jpg"],
     }
+
 
 @pytest.fixture
 def mock_multiple_create_product_data():
@@ -643,21 +689,24 @@ def mock_category_data():
         "description": "test category description",
     }
 
+
 @pytest.fixture
 def mock_subcategory_data():
     return {
         "name": "subcategory",
         "description": "test subcategory description",
-        "parent_category_id": 2
+        "parent_category_id": 2,
     }
+
 
 @pytest.fixture
 def mock_update_category_data():
     return {
         "name": "category updated",
         "description": "test category description updated",
-        "parent_category_id": 1
+        "parent_category_id": 1,
     }
+
 
 @pytest.fixture
 def mock_vendor_apply_data():
@@ -670,6 +719,7 @@ def mock_vendor_apply_data():
         "business_logo_url": "https://example.com/profile.jpg",
     }
 
+
 @pytest.fixture
 def mock_vendor_update_data():
     return {
@@ -681,17 +731,21 @@ def mock_vendor_update_data():
         "business_logo_url": "https://example.com/profile.jpg",
     }
 
+
 @pytest.fixture
 def mock_admin_vendor_review_data():
     return {"action": "approve", "reason": "testing"}
+
 
 @pytest.fixture
 def mock_add_cart_item():
     return {"product_id": 1, "quantity": 1}
 
+
 @pytest.fixture
 def mock_update_cart_item():
     return {"product_id": 1, "quantity": 5}
+
 
 @pytest.fixture
 def mock_create_address_data():
@@ -705,6 +759,7 @@ def mock_create_address_data():
         "is_default": True,
     }
 
+
 @pytest.fixture
 def mock_update_address_data():
     return {
@@ -717,6 +772,7 @@ def mock_update_address_data():
         "is_default": True,
     }
 
+
 @pytest.fixture
 def mock_create_payment_method_data():
     return {
@@ -726,6 +782,7 @@ def mock_create_payment_method_data():
         "expiry_date": "12/25",
         "is_default": True,
     }
+
 
 @pytest.fixture
 def mock_update_payment_method_data():
@@ -754,9 +811,22 @@ def mock_promotion_data():
         "image_url": "https://example.com/promotion.jpg",
     }
 
+
 @pytest.fixture
 def mock_article_data():
     return {
         "title": "article test",
         "content": "test content ......................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................",
+    }
+
+
+@pytest.fixture
+def mock_product_review_data():
+    return {"product_id": 1, "user_id": 1, "rating": 5, "comment": "test"}
+
+
+@pytest.fixture
+def mock_pre_checkout_data():
+    return {
+        "promotion_code": "TESTPROMO",
     }
