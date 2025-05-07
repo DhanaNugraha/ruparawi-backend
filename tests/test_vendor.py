@@ -1,5 +1,4 @@
-# import models
-
+from models.user import UserRole
 # uv run pytest -v -s --cov=.
 # uv run pytest tests/test_vendor.py -v -s --cov=. --cov-report term-missing
 
@@ -190,6 +189,31 @@ def test_vendor_apply_logo_validation_error(
     )
 
     assert apply_vendor.status_code == 201
+
+
+def test_vendor_apply_repo_error(
+    client, mock_user_data, mock_vendor_apply_data, mock_token_data, roles_data_inject, db
+):
+    register_user = client.post("/auth/register", json=mock_user_data)
+
+    assert register_user.status_code == 201
+
+    # delete vendor role
+    role = db.session.execute(
+        db.select(UserRole)
+        .filter(UserRole.name == "vendor")
+    ).scalar_one_or_none()
+
+    db.session.delete(role)
+
+    # run 
+    apply_vendor = client.post(
+        "/vendor/apply", json=mock_vendor_apply_data, headers=mock_token_data
+    )
+
+    assert apply_vendor.status_code == 500
+    assert apply_vendor.json["success"] is False
+    assert apply_vendor.json["location"] == "view register vendor repo"
 
 
 # ----------------------------------------------------------------------------- Get vendor profile -----------------------------------------------------------
@@ -522,3 +546,5 @@ def test_get_vendor_recent_orders(
 
 # repo 41-53 in admin
 # repo 57-65 in admin
+
+# views\vendor.py               53     11    79%   65-66, 105-107, 141-142, 165-166, 202-203
