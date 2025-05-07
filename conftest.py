@@ -830,3 +830,22 @@ def mock_pre_checkout_data():
     return {
         "promotion_code": "TESTPROMO",
     }
+
+
+@pytest.fixture
+def mock_checkout_data():
+    return {
+        "shipping_address_id": 1,
+        "billing_address_id": 1,
+        "payment_method_id": 1,
+        "notes": "test notes",
+        "promotion_code": "TESTPROMO",
+    }
+
+
+@pytest.fixture
+def mock_update_order_data():
+    return {
+        "status": "shipped",
+        "notes": "test notes",
+    }

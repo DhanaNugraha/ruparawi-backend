@@ -183,12 +183,11 @@ def get_all_orders_repo(user):
 
 
 def validate_promotion_repo(promo_code, cart_items):
-    print(promo_code)
     promotion = db.one_or_404(
         db.select(Promotion).filter_by(promo_code=promo_code),
         description=f"Promotion does not exist '{promo_code}'.",
     )
-    print(promotion)
+
     # Check active status
     active = promotion.is_active
     if not active:
@@ -216,8 +215,9 @@ def validate_promotion_repo(promo_code, cart_items):
     if not eligible_items:
         return {"valid": False, "error": "No eligible items in cart"}
 
-    # Check usage limits
-    if promotion.usage_limit and promotion.orders.count() >= promotion.usage_limit:
+    usage_limit = promotion.usage_limit
+
+    if (usage_limit or usage_limit == 0) and promotion.orders.count() >= usage_limit:
         return {"valid": False, "error": "Promo usage limit reached"}
 
     return {
@@ -233,9 +233,6 @@ def pre_checkout_promotion_calculation(cart_items, promotion, eligible_item_ids,
         item for item in cart_items if item.product_id in eligible_item_ids
     ]
 
-    if not eligible_order_items:
-        return 0.0
-
     # Calculate discount
     if promotion.promotion_type == "percentage_discount":
         subtotal = sum((item.product.price * item.quantity) for item in eligible_order_items)
@@ -250,8 +247,6 @@ def pre_checkout_promotion_calculation(cart_items, promotion, eligible_item_ids,
     elif promotion.promotion_type == "fixed_discount":
         discount = promotion.discount_value * len(eligible_order_items)
 
-    else:
-        discount = 0.0
 
     # Apply discount, prevent negatives
     total_amount = max(total_amount - discount, 0)
@@ -264,9 +259,6 @@ def apply_promotion_to_order_repo(order, promotion, eligible_item_ids):
     eligible_order_items = [
         item for item in order.items if item.product_id in eligible_item_ids
     ]
-
-    if not eligible_order_items:
-        return order, 0.0
 
     # Calculate discount
     if promotion.promotion_type == "percentage_discount":
@@ -281,9 +273,6 @@ def apply_promotion_to_order_repo(order, promotion, eligible_item_ids):
 
     elif promotion.promotion_type == "fixed_discount":
         discount = promotion.discount_value * len(eligible_order_items)
-
-    else:
-        discount = 0.0
 
     # Apply discount, prevent negatives
     order.total_amount = max(order.total_amount - discount, 0)
