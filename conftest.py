@@ -566,6 +566,23 @@ def product_review_data_inject(test_app):
 
 
 @pytest.fixture
+def testimonial_data_inject(test_app):
+    testimonial_data = [
+        {"id": 1, "message": "test", "vendor_id": 1},
+    ]
+    with test_app.app_context():
+        testimonial_list = []
+        for testimonial in testimonial_data:
+            testimonial_model = models.VendorTestimonial(**testimonial)
+            testimonial_list.append(testimonial_model)
+
+        _db.session.add_all(testimonial_list)
+        _db.session.commit()
+
+        return testimonial_list
+
+
+@pytest.fixture
 def mock_user_data():
     return {
         "username": "eco_buyer",
@@ -849,3 +866,8 @@ def mock_update_order_data():
         "status": "shipped",
         "notes": "test notes",
     }
+
+
+@pytest.fixture
+def mock_testimonial_data():
+    return {"vendor_id": 1, "message": "test message testimonial"}
