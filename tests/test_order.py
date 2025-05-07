@@ -277,6 +277,53 @@ def test_pre_checkout_order(
     pre_checkout_order = client.post("/order/pre-checkout", json=mock_pre_checkout_data, headers=mock_token_data)
 
     print(pre_checkout_order.json)
+    promotion = pre_checkout_order.json["promotion"]
 
     assert pre_checkout_order.status_code == 200
     assert pre_checkout_order.json["success"] is True
+    assert len(pre_checkout_order.json) == 3
+    assert len(promotion) == 4
+    assert len(promotion["eligible_items_ids"]) == 1
+    assert promotion["discount"]== "2.20"
+    assert promotion["total_price"] == "19.78"
+
+
+def test_pre_checkout_order_promotion_not_active(
+    client,
+    mock_user_data,
+    mock_token_data,
+    mock_promotion_data,
+    mock_pre_checkout_data,
+    cart_data_inject,
+    cart_item_data_inject,
+    products_data_inject,
+    category_data_inject,
+    admins_data_inject,
+    roles_data_inject,
+):
+    register_user = client.post("/auth/register", json=mock_user_data)
+
+    assert register_user.status_code == 201
+
+    
+
+    create_promotion = client.post(
+        "/admin/promotions", json=mock_promotion_data, headers=mock_token_data
+    )
+
+    assert create_promotion.status_code == 201
+
+    pre_checkout_order = client.post(
+        "/order/pre-checkout", json=mock_pre_checkout_data, headers=mock_token_data
+    )
+
+    print(pre_checkout_order.json)
+    promotion = pre_checkout_order.json["promotion"]
+
+    assert pre_checkout_order.status_code == 200
+    assert pre_checkout_order.json["success"] is True
+    assert len(pre_checkout_order.json) == 3
+    assert len(promotion) == 4
+    assert len(promotion["eligible_items_ids"]) == 1
+    assert promotion["discount"] == "2.20"
+    assert promotion["total_price"] == "19.78"
