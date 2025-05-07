@@ -300,8 +300,10 @@ def pre_checkout_order_view(user, promotion_code):
 
         # convert cart items to order items
         for item in cart_items:
+            print("here")
+            print(item.product.name)
             total_amount += item.product.price * item.quantity
-
+        print("total amount", total_amount)
         promotion_response = {
                 "title": None,
                 "total_price": total_amount,
@@ -318,11 +320,11 @@ def pre_checkout_order_view(user, promotion_code):
             if promotion.get("error"):
                 return jsonify(
                     {
-                        "message": "Order checked out successfully",
+                        "message": "Order calculated out successfully",
                         "promotion": promotion_response,
                         "success": True,
                     }
-                ), 201
+                ), 200
 
             total_price, discount = pre_checkout_promotion_calculation(
                 cart_items,
@@ -340,11 +342,11 @@ def pre_checkout_order_view(user, promotion_code):
 
         return jsonify(
             {
-                "message": "Order checked out successfully",
+                "message": "Order calculated out successfully",
                 "promotion": promotion_response,
                 "success": True,
             }
-        ), 201
+        ), 200
 
     except ValidationError as e:
         return jsonify(

@@ -183,11 +183,12 @@ def get_all_orders_repo(user):
 
 
 def validate_promotion_repo(promo_code, cart_items):
+    print(promo_code)
     promotion = db.one_or_404(
         db.select(Promotion).filter_by(promo_code=promo_code),
         description=f"Promotion does not exist '{promo_code}'.",
     )
-
+    print(promotion)
     # Check active status
     active = promotion.is_active
     if not active:

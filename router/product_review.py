@@ -4,7 +4,7 @@ from repo import product_review as review_repo
 
 product_review_router = Blueprint("product_review", __name__, url_prefix="/review")
 
-@product_review_router.route("/", methods=["POST"])
+@product_review_router.route("", methods=["POST"])
 @jwt_required()
 def create_product_review():
     data = request.json
