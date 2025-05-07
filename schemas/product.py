@@ -474,3 +474,21 @@ class PromotionDetailResponse(BaseModel):
         from_attributes=True,  # Can read SQLAlchemy model
         extra="ignore",  # ignore extra fields
     )
+
+
+# -------------------------------------------------- Get public vendor products --------------------------------------------------
+
+
+class PublicVendorProductsParams(BaseModel):
+    business_name: Optional[str] = None
+    category_name: Optional[str] = None
+    
+    @field_validator("business_name")
+    def validate_business_name(cls, value):
+        return value.replace("-", " ")
+    
+    @field_validator("category_name")
+    def validate_category_name(cls, value):
+        return value.replace("-", " ")
+
+    model_config = ConfigDict(extra="ignore")
