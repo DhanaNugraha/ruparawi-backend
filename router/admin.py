@@ -72,12 +72,10 @@ def create_article():
 
 
 @admin_router.route("/article", methods=["GET"])
-@jwt_required()
 def get_articles():
     return get_articles_view()
 
 @admin_router.route("/article/<int:article_id>", methods=["GET"])
-@jwt_required()
 def get_articles_by_id_view(article_id):
     return get_article_by_id_view(article_id)
 
