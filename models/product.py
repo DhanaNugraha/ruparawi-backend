@@ -123,6 +123,7 @@ class Product(db.Model, BaseModel):
     tags = db.relationship("ProductTag", secondary=product_tag_association, backref="product", lazy=True)
     cart_items = db.relationship("CartItem", backref="product", lazy=True)
     order_items = db.relationship("OrderItem", backref="product", lazy=True)
+    currency = db.relationship("Currencies", backref="product", lazy=True)
 
     def update_rating_stats(self):
         # Recalculates average rating and review count
@@ -216,3 +217,13 @@ class Promotion(db.Model, BaseModel):
             <= now_
             <= self.end_date.replace(tzinfo=timezone.utc)
         )
+    
+
+# ------------------------------------------------------- Currency handler ------------------------------------------------
+
+class Currency(db.Model, BaseModel):
+    __tablename__ = "currencies"
+
+    code = db.Column(db.String(3), primary_key=True)  # ISO 4217 (USD, EUR, etc.)
+    name = db.Column(db.String(50))
+    conversion_rate = db.Column(db.Numeric(10, 6))  # Relative to base currency
