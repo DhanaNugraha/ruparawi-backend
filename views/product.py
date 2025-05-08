@@ -532,8 +532,6 @@ def get_public_vendor_products_view(params):
 
         products = get_public_vendor_products_repo(params_data_validated)
 
-        print(products)
-
         products_response = [
             VendorProductsResponse.model_validate(product).model_dump()
             for product in products
