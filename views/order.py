@@ -4,7 +4,7 @@ from pydantic import ValidationError
 from instance.database import db
 from repo.order import add_item_to_shopping_cart_repo, add_order_status_history_repo, apply_promotion_to_order_repo, checkout_order_repo, clear_shopping_cart_item_repo, delete_shopping_cart_item_repo, get_all_orders_repo, get_cart_items_repo, get_cart_with_items_and_product_repo, get_order_repo, get_promotions_repo, get_shopping_cart_repo, pre_checkout_promotion_calculation, process_order_items, update_order_status_repo, update_shopping_cart_item_repo, validate_promotion_repo
 from repo.product import get_product_detail_repo, verify_product_repo
-from schemas.order import AddCartItemResponse, CartItemResponse, CartResponse, CartItemUpdate, CartItemCreate, OrderCreate, OrderResponse, OrderStatusUpdate
+from schemas.order import AddCartItemResponse, CartResponse, CartItemUpdate, CartItemCreate, OrderCreate, OrderResponse, OrderStatusUpdate
 from shared.time import now
 
 
@@ -18,7 +18,15 @@ def get_shopping_cart_view(user):
         cart_items = get_cart_items_repo(cart.id)
 
         cart_items_response = [
-            CartItemResponse.model_validate(cart_item).model_dump() for cart_item in cart_items
+            {
+                "product_id": item.product_id,
+                "quantity": item.quantity,
+                "product": {
+                    "name": item.product_name,
+                    "price": item.price,
+                    "image_url": item.image_url,
+                },
+            } for item in cart_items
         ]
 
         return jsonify(

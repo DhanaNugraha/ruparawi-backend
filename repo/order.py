@@ -1,7 +1,8 @@
+from sqlalchemy import and_, func
 from instance.database import db
 from models.order import Order, OrderItem, OrderStatus, OrderStatusHistory, PaymentStatus, ShoppingCart, CartItem
 from sqlalchemy.orm import contains_eager, joinedload
-from models.product import Promotion, promotion_order_association
+from models.product import Product, ProductImage, Promotion, promotion_order_association
 
 
 def get_shopping_cart_repo(user):
@@ -17,13 +18,28 @@ def get_shopping_cart_repo(user):
 
 def get_cart_items_repo(cart_id):
     return (
-        db.session.execute(
-            db.select(CartItem)
-            .join(CartItem.product)
-            .options(contains_eager(CartItem.product))  # Eager load product data
-            .where(CartItem.cart_id == cart_id)
+        db.session.query(
+            CartItem.product_id,
+            CartItem.quantity,
+            Product.name.label("product_name"),
+            Product.price,
+            func.max(ProductImage.image_url).label("image_url"),
         )
-        .scalars()
+        .join(CartItem.product)
+        .outerjoin(
+            ProductImage,
+            and_(
+                ProductImage.product_id == Product.id,
+                ProductImage.is_primary == True,  # noqa: E712
+            ),
+        )
+        .filter(CartItem.cart_id == cart_id)
+        .group_by(
+            CartItem.product_id,
+            CartItem.quantity,
+            Product.name,
+            Product.price,
+        )
         .all()
     )
 

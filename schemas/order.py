@@ -35,27 +35,6 @@ class CartItemUpdate(BaseModel):
         return value
 
 
-class ProductBase(BaseModel):
-    name: str
-    price: float
-
-    model_config = ConfigDict(
-        from_attributes=True,  # Can read SQLAlchemy model
-        extra="ignore",  # ignore extra fields
-    )
-
-
-class CartItemResponse(BaseModel):
-    product_id: int
-    quantity: int
-    product: ProductBase
-
-    model_config = ConfigDict(
-        from_attributes=True,  # Can read SQLAlchemy model
-        extra="ignore",  # ignore extra fields
-    )
-
-
 class CartResponse(BaseModel):
     user_id: int
 
