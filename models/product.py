@@ -123,7 +123,6 @@ class Product(db.Model, BaseModel):
     tags = db.relationship("ProductTag", secondary=product_tag_association, backref="product", lazy=True)
     cart_items = db.relationship("CartItem", backref="product", lazy=True)
     order_items = db.relationship("OrderItem", backref="product", lazy=True)
-    currency = db.relationship("Currencies", backref="product", lazy=True)
 
     def update_rating_stats(self):
         # Recalculates average rating and review count
