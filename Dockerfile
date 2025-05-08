@@ -17,7 +17,7 @@ RUN uv sync
 EXPOSE 3005  
 
 # Run tests first
-# RUN uv run pytest -v -s --cov=.
+RUN uv run pytest -v -s --cov=.
 
 # Run the app
 CMD ["uv", "run", "flask", "--app", "app", "run", "--host", "0.0.0.0", "--port", "8000"]

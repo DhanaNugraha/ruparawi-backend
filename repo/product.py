@@ -262,7 +262,6 @@ def verify_product_repo(product, requested_quantity):
 
 def get_public_vendor_products_repo(params):
     if params.category_name is not None and params.business_name is not None:
-        print("here 1")
         return db.session.execute(
             db.select(Product)
             .filter_by(is_active=True)
