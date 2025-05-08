@@ -129,7 +129,7 @@ This API is deployed using **Koyeb**  with the following base url for the API re
 `mad-adriane-dhanapersonal-9be85724.koyeb.app/`
 
 ## Database Schema Documentation
-<img src="https://github.com/DhanaNugraha/Revou-Individual-test/blob/main/assets/Sustainable%20Community%20Market.png">
+<img src="https://github.com/DhanaNugraha/ruparawi-backend/blob/main/assets/Rupa%20Rawi.png">
 
 
 ## Contributing
