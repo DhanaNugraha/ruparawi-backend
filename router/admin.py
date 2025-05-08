@@ -8,8 +8,6 @@ from views.admin import (
     create_promotion_view,
     delete_article_view,
     get_all_promotions_view,
-    get_article_by_id_view,
-    get_articles_view,
     soft_delete_category_view,
     update_article_view,
     update_category_view,
@@ -69,16 +67,6 @@ def get_admin_logs():
 @admin_required()
 def create_article():
     return create_article_view(request.get_json())
-
-
-@admin_router.route("/article", methods=["GET"])
-def get_articles():
-    return get_articles_view()
-
-@admin_router.route("/article/<int:article_id>", methods=["GET"])
-def get_articles_by_id_view(article_id):
-    return get_article_by_id_view(article_id)
-
 
 @admin_router.route("/article/<int:article_id>", methods=["PUT", "DELETE"])
 @jwt_required()

@@ -1102,7 +1102,7 @@ def test_get_all_article(
 
     assert register_user.status_code == 201
 
-    get_articles = client.get("/admin/article", headers=mock_token_data)
+    get_articles = client.get("/products/article", headers=mock_token_data)
 
     assert get_articles.status_code == 200
     assert get_articles.json["success"] is True
@@ -1126,9 +1126,7 @@ def test_get_article_by_id(
 
     assert register_user.status_code == 201
 
-    get_article_by_id = client.get(
-        "/admin/article/1", headers=mock_token_data
-    )
+    get_article_by_id = client.get("/products/article/1", headers=mock_token_data)
 
     assert get_article_by_id.status_code == 200
     assert get_article_by_id.json["success"] is True
@@ -1147,7 +1145,7 @@ def test_get_article_by_id_repo_error(
 
     assert register_user.status_code == 201
 
-    get_article_by_id = client.get("/admin/article/1", headers=mock_token_data)
+    get_article_by_id = client.get("/products/article/1", headers=mock_token_data)
 
     assert get_article_by_id.status_code == 500
     assert get_article_by_id.json["success"] is False
