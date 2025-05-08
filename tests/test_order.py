@@ -3,9 +3,6 @@ from models.product import Product, Promotion
 # uv run pytest -v -s --cov=.
 # uv run pytest tests/test_order.py -v -s --cov=. --cov-report term-missing
 
-# change test for out of stock to the new one for both inactive and out of stock?
-
-
 # ---------------------------------------------------------------------------- Get cart test ----------------------------------------------------------------------------
 
 def test_get_cart(client, mock_user_data, mock_token_data, roles_data_inject):
