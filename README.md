@@ -101,7 +101,7 @@ A RESTful API for connecting local communities with sustainable products. This p
 # 📚 API Documentation
 
 Full endpoint documentation available at:
-[API Documentation](https://6uvtx8to8t.apidog.io/)
+[API Documentation](https://htbqfpdh5y.apidog.io/)
 
 Deployed on Koyeb, base URL:
 `mad-adriane-dhanapersonal-9be85724.koyeb.app/`
